@@ -1,0 +1,27 @@
+.wishlist-count-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .wishlist-icon {
+    font-size: 1.3rem; /* Adjust the icon size as needed */
+    color: #ec4899; /* Corresponds to text-pink-500 in Tailwind */
+    cursor: pointer;
+  }
+  
+  .wishlist-count {
+    position: absolute;
+    top: -5px; /* Adjust for placement */
+    right: -5px; /* Adjust for placement */
+    background-color: #dc2626; /* Red color for the badge */
+    color: #fff; /* White text */
+    font-size: 10px; /* Adjust the font size */
+    font-weight: bold;
+    border-radius: 50%; /* Circular badge */
+    padding: 2px 6px; /* Adjust padding for size */
+    line-height: 1; /* Fix vertical alignment */
+    min-width: 18px; /* Maintain circular shape for single-digit counts */
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+  }
+  

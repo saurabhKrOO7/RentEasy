@@ -1,0 +1,1452 @@
+sudo mongod --dbpath=/Users/saurabhkumar/data/db
+EO7gi45HtExEOkQH7p87LoPu_Y9ViVcO0kUFBNiu2kp77k9DY-GIz41zpqVY4BmceDmng_H9FIG3Qoij
+npm i dotenv : to secure our private data
+npm i bcryptjs: to hash our password
+
+
+STEP 1: Creating our own SERVER
+We will create a server using express.js. We will create a new file called server.js. Express js is popular framework of Node js.
+
+For that we need to install express js in our project. we will navigate to our server folder and there we will install our all dependencies.
+-> npm i express  [it will install our express and we are good to go].
+
+const express = require("express");
+const app = express();
+
+app.get("/", (req, res) => {
+  res.status(200).send("Welcome to Mern Series");
+});
+
+app.get("/register", (req, res) => {
+  res.status(200).json({ msg: "registration successful" });
+});
+
+const PORT = 5000;
+app.listen(PORT, () => {
+  console.log(`server is running at port: ${PORT}`);
+});
+
+The above code will create our own server at PORT 5000.
+We will use this server to create our routes.
+
+
+
+
+
+STEP 2: Set-up ROUTERS
+In this step we will be creating routers according to our needs.
+
+We will create a new folder called router and inside that folder we will create a new file.
+
+For example, we will create a file called auth.js. This file will contain all the routes related to authentication field.
+
+One of the most important advantage of using routers is that it don't refresh our pages when we toggle b/w pages. 
+
+We will import express router in our auth.js file.
+
+const express = require("express");
+const router = express.Router();
+
+router.route("/").get((req, res) => {
+  res.status(200).send("Welcome to Mern Series");
+});
+
+router.route("/register").get((req, res) => {
+  res.status(200).json({ msg: "registration successful from router" });
+});
+
+module.exports = router
+
+after doing that, we need to import that file in our server.js file.
+
+const router = require("./routes/auth-route");
+
+// Mount the Router: To use the router in your main Express app, you can "mount" it at a specific URL prefix
+app.use("/api/auth", router);
+
+We can only access our "/", "/register" page that defined in our Router file by writing first "/api/auth/your_url".
+
+
+
+
+
+
+STEP 3: CONTROLLER
+What we are doing earlier is that we are defining our whole logic in Router file, which is not a good practice. We will creater a CONTROLLER folder and inside that we will write our logic.
+
+//? In an Express.js application, a "controller" refers to a part of your code that is responsible for handling the application's logic. Controllers are typically used to process incoming requests, interact with models (data sources), and send responses back to clients. They help organize your application by separating concerns and following the MVC (Model-View-Controller) design pattern.
+
+
+//? Controllers are usually the most complex part of an Express.js application, as they contain the business logic of your application. They are responsible for handling requests, interacting with models, and sending responses back to clients. 
+
+Controllers are typically written in JavaScript files and are imported into your main application file (usually server.js).
+
+const home = async (req, res) => {
+  try {
+    res.status(200).json({ msg: "Welcome to our home page" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const register = async (req, res) => {
+  try {
+    res.status(200).send({ message: "registration page" });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+module.exports = { home, register };
+
+after writing logic in controller file, we need to import that in router file
+
+const authControllers = require("../controllers/auth-controller");
+
+router.route("/").get(authControllers.home);
+router.route("/register").get(authControllers.register);
+
+
+
+
+
+
+STEP 4: creating Registration Form and getting response
+=======================================================
+We will create a registration form in our register page and we will get the response from that form.
+
+Before starting we need to add one most important line i.e.
+app.use(express.json());
+this line is used to parse the JSON data in the request body.
+
+This line of code adds Express middleware that parses incoming request bodies with JSON payloads. It's important to place this before any routes that need to handle JSON data in the request body. This middleware is responsible for parsing JSON data from requests, and it should be applied at the beginning of your middleware stack to ensure it's available for all subsequent route handlers.
+
+we can use postman to get the data:
+- set the url as: http://localhost:5000/api/auth/register
+- go to the body section
+- choose raw and then JSON
+
+
+
+
+
+
+STEP 5: Connecting Backend with MongoDB Database (Node.js + Mongoose Connection)
+We will use Mongoose to connect our backend with MongoDB database.
+
+Mongoose is a MongoDB object modeling tool designed to work in an asynchronous environment.
+Mongoose provides a lot of features for interacting with MongoDB, including:
+- Schemas: Define the structure of your data.
+- Models: Create instances of your schema.
+- Queries: Find, update, and delete data in your database.
+- Hooks: Run functions before or after certain operations.
+- Plugins: Extend Mongoose with additional functionality.
+- Validators: Validate data before saving it to the database.
+- and many more....
+
+For that we will create a utils folder and inside that we have db.js file.
+we will be required mongoose package to work with mongoDB.
+npm in mongoose
+
+const mongoose = require("mongoose");
+
+const URI = "mongodb://127.0.0.1:27017/mern_admin_panel";
+
+const connectDb = async () => {
+  try {
+    await mongoose.connect(URI);
+    console.log("connection successful to DB");
+  } catch (error) {
+    console.error("database connection fail");
+    process.exit(0);
+  }
+};
+
+module.exports = connectDb;
+
+The above URI you will get when you install mongoDB in your system.
+After that we need to tell our server.js file that we are using Database. For that below is our required code.
+
+const connectDb = require("./utils/db");
+
+connectDb().then(() => {
+  app.listen(PORT, () => {
+    console.log(`server is running at port: ${PORT}`);
+  });
+});
+
+this line ensures that if our database connection get successful, then only create our server else not.
+
+
+
+
+
+
+
+STEP 6: Securing Your Private Data with Dotenv
+
+If you have noticed in above step, we have sensitive information in URI that we don't want our user to show / or when we host our website.
+For that we can make use of dotenv to hide that sensitive information
+
+-> npm in dotenv
+-> create a .env file in root directory of your project
+-> add your sensitive information in .env file
+-> install dotenv package in your project
+-> require dotenv package in your server.js file. This line must be at the top.
+-> use process.env to get the value of your sensitive information
+-> remove your sensitive information from your server.js file
+
+In server.js file, add the following
+require("dotenv").config();
+
+In db.js file, make changes in
+const URI = process.env.MONGODB_URI;   // MONGODB_URI is the variable name in dotenv file.
+
+
+
+
+
+
+STEP 7: Creating the User Schema & Model
+In this step, we will create the schema for our user and then create a model for it.
+The schema will define the structure of our user document in the database.
+The model will provide a way to interact with the user documents in the database.
+We will use Mongoose to create the schema and model.
+Mongoose is a popular ORM (Object Relational Mapping) tool for MongoDB.
+It allows us to define a schema for our data and then use that schema to interact with the database
+
+-> npm install mongoose
+-> create a new file called user.js in the models directory
+-> in user.js file, import mongoose and create a new schema for the user
+-> define the fields in the schema, such as name, email, password, etc.
+-> create a new model using the schema
+-> export the model
+
+const mongoose = require("mongoose");
+
+// Define the User schema
+const userSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  phone: {
+    type: String,
+    required: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+// define the model or the collection name
+export const User = new mongoose.model("USER", userSchema);
+
+
+
+
+
+STEP 8: Storing Registered User Data in an Online Database with Express and Mongoose
+In this step, we will create a new route to handle user registration.
+We will use the User model we created in the previous step to store the user data in the database
+We will use the express-validator middleware to validate the user input
+We will use the bcrypt library to hash the user password
+We will use the jsonwebtoken library to generate a JWT token for the user
+
+We will create auth-controller.js file in controller folder to write the logic
+we will require that model in our controller folder
+
+const User = require("../models/auth-model");
+const register = async (req, res) => {
+  try {
+    console.log(req.body);
+    const { username, email, phone, password } = req.body;
+
+    const userExist = await User.findOne({ email: email });
+
+    if (userExist) {
+      return res.status(400).json({ msg: "email already exists" });
+    }
+
+    const userCreated = await User.create({ username, email, phone, password });
+
+    res.status(201).json({ msg: userCreated });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+-> req.body will give all the values in input field
+-> findOne({email : email})  will give the data of user which matches
+-> create({}) will create a new row in DB.
+
+
+
+
+
+
+STEP 9: Secure User Password using Bcrypt.js
+Hashing passwords is crucial for security because it converts plaintext passwords into irreversible, unique codes, making it significantly harder for attackers to decipher and misuse sensitive user information. This adds a vital layer of protection, enhancing overall data security in applications.
+
+In this step, we will use the bcrypt library to hash the user password
+We will use the bcrypt.hash function to hash the password
+We will use the bcrypt.compare function to compare the password with the hashed password
+We will update the register function to hash the password before storing it in the database
+We will update the login function to compare the password with the hashed password
+
+We will update the login function to return a JWT token if the password is correct
+We will use the jsonwebtoken library to generate a JWT token
+We will update the login function to return the JWT token in the response
+We will use the res.json function to return the JWT token in the response
+
+
+-> npm i bcryptjs
+-> Go to schema and make changes as:
+    const bcrypt = require("bcryptjs");
+
+    Before creating model, add some code i.e.
+    actually we are adding middleware.
+
+userSchema.pre("save", async function () {
+  const user = this;
+  console.log("actual data ", this);
+
+  if (!user.isModified) {
+    return next();
+  }
+
+  try {
+    const saltRound = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(user.password, saltRound);
+    user.password = hashedPassword;
+  } catch (error) {
+    return next(error);
+  }
+});
+
+export const User = new mongoose.model("USER", userSchema);
+
+
+
+
+
+
+
+
+STEP 10: Secure User Authentication with JSON Web Token (JWT)
+JSON Web Tokens (JWT) are a compact, URL-safe means of representing claims to be transferred between two parties. The token is digitally signed and contains a payload that can be verified and trusted.
+
+Tokens, such as JWTs (JSON Web Tokens), are typically not stored in the database along with other user details. Instead, they are issued by the server during the authentication process and then stored on the client-side (e.g., in cookies or local storage) for later use.
+
+JWTs are often used for authentication and authorization in web applications.
+Authentication: Verifying the identity of a user or client.
+Authorization: Determining what actions a user or client is allowed to perform.
+
+-> npm i jsonwebtoken
+-> Go to models and make changes as:
+
+const { jwt } = require("jsonwebtoken");
+//?  Generating JWT token
+userSchema.methods.generateToken = async function (){
+    try{
+        return jwt.sign({
+            userId: this._id.toString(),
+            email: this.email,
+            isAdmin: this.isAdmin 
+        },
+        process.env.JWT_SECRET_KEY,{
+            expiresIn: "30d"    // 30 days
+        }
+    )
+    }catch(error){
+        console.log(error);
+    }
+}
+
+
+after that go the controller and just after creating row in table, generate token as well.
+res.status(201).json({
+    message: "registration successful",
+    token: await userCreated.generateToken(),
+    userId: userCreated._id.toString()
+});
+
+
+
+
+
+STEP 10: User Login Route with Functionality
+Create a new route for user login. This route should accept the user's email and password, verify the credentials, and return a JWT token if the credentials are valid.
+
+-> Go to router and add new router:
+router.route("/login").post(authControllers.login);
+
+-> Write logic for login
+const login = async(req, res)=>{
+    try{
+        const {email, password} = req.body;
+
+        const userExist = await User.findOne({email: email});
+
+        if(!userExist)  return res.status(400).json({msg: "Invalid credentials"});
+
+        const user = await userExist.comparePassword(password);    // defined in user-model
+
+        if(user){
+            return res.status(200).json({
+                msg: "Login successful",
+                token : await userExist.generateToken(),
+                userId: userExist._id.toString()
+            })
+        }else{
+            return res.status(400).json({msg: "Invalid credentials"});
+        }
+        
+    }catch(error){
+        next(error);
+    }
+}
+
+-> Here we are also storing 
+-> for comparePassword, go to user model and write
+userSchema.methods.comparePassword = async function(password){
+    return bcrypt.compare(password, this.password);
+}
+if password matches, then only login.
+
+
+
+
+
+
+
+STEP 10: Registration & Login Form Validation using ZOD
+Install Zod package
+npm install zod
+-> Create a new file called auth-validator.js in separate validators folder
+-> do code as follow
+const {z} = require("zod");
+
+const loginSchema = z.object({
+    email: z
+    .string({required_error: "Email is required"})
+    .trim()
+    .email({message: "Invalid email address"})
+    .min(3, {message: "Name must be at least 3 characters"})
+    .max(255, {message: "Name must not exceed 255 character"}),
+
+    password: z
+    .string({required_error: "Password is required"})
+    .min(7, {message: "Password must be at least 3 characters"})
+    .max(1024, {message: "Phone must below 1024 characters"}),
+})
+
+const signupSchema = z.object({
+    username: z
+    .string({required_error: "Name is required"})
+    .trim()
+    .min(3, {message: "Name must be at least 3 characters"})
+    .max(255, {message: "Name must not exceed 255 character"}),
+
+    email: z
+    .string({required_error: "Email is required"})
+    .trim()
+    .email({message: "Invalid email address"})
+    .min(3, {message: "Email must be at least 3 characters"})
+    .max(255, {message: "Email must not exceed 255 character"}),
+
+    phone: z
+    .string({required_error: "Phone is required"})
+    .trim()
+    .min(10, {message: "Phone must be of 10 characters"})
+    .max(15, {message: "Phone must be of 10 characters"}),
+
+    password: z
+    .string({required_error: "Password is required"})
+    .min(7, {message: "Password must be at least 7 characters"})
+    .max(1024, {message: "Phone must below 1024 characters"}),
+})
+
+module.exports = {signupSchema, loginSchema};
+
+after that we have to go to our validate-middleware.js file, where we will import that schema and make use of it
+
+const validate = (schema) => async(req, res, next) =>{
+    try{
+        const parseBody = await schema.parseAsync(req.body);
+        req.body = parseBody;
+        next();
+    }catch(err){
+        const extraDetails = err.errors[0].message;
+        const details = err.errors[0].message;
+        const status = 422;
+        const error = {status, details, extraDetails};
+        console.log(error);
+        next(error);
+    }
+}
+
+module.exports = validate;
+
+await schema.parseAsync(req.body) is the line where you use Zod to validate the request body data against the defined schema.
+
+Given any Zod schema, you can call its `.parse` method to check `data` is valid. If it is, a value is returned with full type information! Otherwise, an error is thrown.
+
+
+after that we will go to the router, and import that zod schema that we have just defined and call this as a middleware
+
+const validate = require("../middlewares/validate-middleware");
+const signupSchema = require("../validators/auth-validator");
+
+router
+    .route('/register')
+    .post(validate(signupSchema), authControllers.register);
+
+router
+    .route('/login')
+    .post(validate(loginSchema), authControllers.login);
+
+
+here we added new line validate(signupSchema) before controller.
+This will validate the request body data against the defined schema. If the data is valid, it will continue to the controller. If the data is invalid, it will return a 422 error with the validation errors.
+This is how you can use Zod to validate request body data in Node.js. You can define
+schemas for different types of data and use them to validate the request body data. This will help you to catch errors early and provide better error messages to the users.
+
+
+
+
+
+
+STEP 11: Express.js Error Handling
+=====================================
+In Express.js, error handling is a crucial part of building robust and reliable applications. Here's how you can handle errors in Express.js:
+### Error Handling Middleware
+You can use the `next` function to pass an error to the next middleware in the stack.
+
+Now, we will create a common erro file "error-middleware.js" in our middleware folder.
+What we will do that instead of writing error msg every time in try-catch block, we can simply called next() function and this will automatically redirect it to error-middleware.js file and there we will display the error msg.
+
+const errorMiddleware = (err, req, res, next)=>{
+    const status = err.status || 500;
+    const message = err.message || "BACKEND ERROR";
+    const extraDetails = err.extraDetails || "ERROR FROM BACKEND/SERVER";
+
+    return res.status(status).json({message, extraDetails});
+};
+
+module.exports = errorMiddleware;
+
+now we are using middleware, we have to tell the server.js file.
+Go to the server.js file and make changes as:
+
+const errorMiddleware = require("./middlewares/error-middleware");
+app.use(errorMiddleware);
+
+we added the app.use() line just after routes.
+
+
+
+
+
+
+STEP 12: Building Complete Contact Form (Schema, Route & Logics)
+=================================================================
+
+-> Go to the models folder and create a new file contact-model.js file
+
+const { Schema, model } = require("mongoose");  
+const contactSchema = new Schema({ username: { type: String, required: true }, email: { type: String, required: true },  
+ message: { type: String, required: true }, }); 
+
+const Contact = new model("Contact", contactSchema); 
+module.exports = Contact;  
+
+
+-> After that, we need to create a contact route.
+Go to the routes folder and create a new file contact-router.js file
+
+const express = require('express');
+const router = express.Router();
+const contactForm = require("../controllers/contact-controller")
+
+router
+    .route('/contact')
+    .post(contactForm)
+
+module.exports = router;
+
+
+-> After that we need to define our logic of contact, for that we need to go to our controllers folder.
+Go to the controllers folder and create a new file contact-controller.js file
+
+const Contact = require("../models/contact-mode");
+
+const contactForm = async (req, res)=>{
+    try{
+        const response = req.body;
+        console.log(response);
+        await Contact.create(response);
+        return res.status(200).json({msg: "Message sent successfully!"});
+    }catch(err){
+        return res.status(500).json({msg: "message not delivered"});
+    }
+};
+
+module.exports = contactForm;
+
+-> Finally go to the server.js file and import the routes we defined
+
+const contactRoute = require("./routes/contact-route");
+app.use("/api/form", contactRoute);
+
+
+
+
+
+STEP 13: Now we work with some Front-end in (React JS)
+======================================================
+
+-> npm create vite@latest
+-> npm install
+-> npm run dev
+
+
+
+
+
+STEP 14: React Page Navigation with React Router DOM
+====================================================
+
+-> We need to install the react-router-dom package in order to create the navigation possible in our react.js.
+-> npm install react-router-dom
+
+-> Now, we need to update our App.jsx file
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Home } from "./pages/Home";
+import { About } from "./pages/About";
+import { Contact } from "./pages/Contact";
+import { Service } from "./pages/Service";
+import { Register } from "./pages/Register";
+import { Login } from "./pages/Login";
+
+const App = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/service" element={<Service />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;
+
+Once it's done, now it's time for us to create a different pages for each route that we define in our app.jsx file. Then only we can navigate to that pages.
+-> We need to create a new folder called pages in our src folder.
+-> Inside the pages folder, we need to create a new file for each route that we define in our app.jsx file. For example, we need to create a new file called Home.jsx, About.jsx, Contact.jsx, Service.jsx, Register.jsx, Login.jsx.
+-> Now, we can start creating the components for each page.
+
+
+
+
+
+STEP 15: Building Navbar with React | Open Page without Reloading
+=================================================================
+-> We need to create one folder inside our src folder, and named it as Components. Inside components folder, create one file and named it Navbar.jsx (Make sure to use pascal convention to create the file name inside components folders.)
+-> Now, we need to update our Navbar.jsx file
+
+import { NavLink } from "react-router-dom";
+import "./Navbar.css";
+
+export const Navbar = () => {
+  return (
+    <>
+      <header>
+        <div className="container">
+          <div className="logo-brand">
+            <NavLink to="/">Mern Website</NavLink>
+          </div>
+
+          <nav>
+            <ul>
+              <li>
+                <NavLink to="/"> Home </NavLink>
+              </li>
+              <li>
+                <NavLink to="/about"> About </NavLink>
+              </li>
+              <li>
+                <NavLink to="/service"> Services </NavLink>
+              </li>
+              <li>
+                <NavLink to="/contact"> Contact </NavLink>
+              </li>
+              <li>
+                <NavLink to="/register"> Register </NavLink>
+              </li>
+              <li>
+                <NavLink to="/login"> Login </NavLink>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+    </>
+  );
+};
+
+Now we need to add the navbar.jsx in our main app.jsx file in order to get the navbar always top in our all pages.
+
+import { Navbar } from "./components/Navbar";
+<Navbar />
+
+
+
+
+
+
+STEP 16: Complete Registration Page UI & stored Form data in React State Variable
+=================================================================================
+-> To store data locally, we can use {useState} in react.
+-> We will use {useState} to store the form data in the state variable.
+-> We will use {useEffect} to prevent the form from submitting multiple times.
+-> We will use {useNavigate} to navigate to the login page after registration.
+
+import { useState } from "react";
+
+export const Register = () => {
+  const [user, setUser] = useState({
+    username: "",
+    email: "",
+    phone: "",
+    password: "",
+  });
+
+  const handleInput = (e) => {
+    console.log(e);
+    let name = e.target.name;
+    let value = e.target.value;
+
+    setUser({
+      ...user,
+      [name]: value,
+    });
+  };
+
+  // handle form on submit
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(user);
+  };
+
+
+  return (
+    <>
+      <section>
+        <main>
+          <div>
+            <div>
+
+              {/* our main registration code  */}
+              <div>
+                <h1">registration form</h1>
+                <br />
+                <form onSubmit={handleSubmit}>
+                  <div>
+                    <label htmlFor="username">username</label>
+                    <input
+                      type="text"
+                      name="username"
+                      value={user.username}
+                      onChange={handleInput}
+                      placeholder="username"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="email">email</label>
+                    <input
+                      type="text"
+                      name="email"
+                      value={user.email}
+                      onChange={handleInput}
+                      placeholder="email"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="phone">phone</label>
+                    <input
+                      type="number"
+                      name="phone"
+                      value={user.phone}
+                      onChange={handleInput}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="password">password</label>
+                    <input
+                      type="password"
+                      name="password"
+                      value={user.password}
+                      onChange={handleInput}
+                      placeholder="password"
+                    />
+                  </div>
+                  <br />
+                  <button type="submit">
+                    Register Now
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </main>
+      </section>
+    </>
+  );
+};
+
+value = {user.password}
+onChange = {handleInput}
+
+In handleInput function, we are updating the value in state variable.
+
+
+
+
+
+
+
+STEP 17: Complete Login Page UI | Storing Login Form Data in React State
+========================================================================
+
+This is same as we done in registration.
+One more functionality we can add is that, if user logged into our website, then redirect it to homepage.
+
+import { useNavigate } from "react-router-dom";
+const navigate = useNavigate();
+navigate("/);
+
+
+
+
+
+
+STEP 18: Create contact form and storing data in state
+======================================================
+We will create contact form and storing data in state.
+This is same as above.
+
+
+
+
+STEP 19: 404 Error Page
+=======================
+Suppose user enters wrong address, then we want to show him error page.
+-> create a page name Error.jsx and write the material
+-> import it in App.js and use it
+-> <Route path="*" element={<Error/>} />
+-> This will be the only modification.
+
+
+
+
+
+
+STEP 20: Connect React with NodeJS & MongoDB | Stored Registration Form Data in Database
+========================================================================================
+-> Go to our Registration page and handle the form submit action as
+
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(user);
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+      console.log("response data : ", response);
+
+      if (response.ok) {
+        const responseData = await response.json();
+        alert("registration successful");
+        setUser({ username: "", email: "", phone: "", password: "" });
+        console.log(responseData);
+      } else {
+        console.log("error inside response ", "error");
+      }
+    } catch (error) {
+      console.error("Error", error);
+    }
+  };
+
+-> Since we are sending/uploading data in our database, that's why we are using POST method.
+-> We are sending data to our server at port 5000.
+-> We are sending data in JSON format.
+-> That's not all, we will get CORS error, because we are using different port at client side and server side.
+-> We will handle it by using CORS package in our server side in server.js file.
+-> npm i cors
+
+const cors = require("cors");
+const app = express();
+
+const corsOptions = {
+  origin: "http://localhost:5175",
+  methods: "GET, POST, PUT, DELETE, PATCH, HEAD",
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+// to get the json data in express app.
+app.use(express.json());
+
+
+
+
+
+
+STEP 21: Storing React Login Form Data in our MongoDB Database
+==============================================================
+-> We will use the same code as above to store the data in our MongoDB database.
+-> We will use the same POST method to send the data to our server.
+-> We will use the same JSON format to send the data to our server.
+-> We will use the same CORS package to handle the CORS error.
+-> We will use the same express app to handle the request and send the response.
+-> We will use the same MongoDB database to store the data.
+
+import { useAuth } from "../store/auth";
+
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("after login: ", responseData);
+        saveTokenInLocalStr(responseData.token);
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  -> In the login phase, we are creating a token so that we can save the login info of tha particular user and prevent user from repeatedly login every single time.
+  -> We are using the token to save the user info in the local storage.
+  -> We are using the token to send the request to the server.
+
+  -> In this we have created a auth.jsx file.
+  -> This is similar to global variable in any programming, where we can access that variable value from anywhere. Similarly we have authprovider in react where we can store such information that we need in many pages.
+  -> Below is the common syntax of auth.jsx file, we need to learn that code.
+
+import { createContext, useContext } from "react";
+
+export const AuthContext = createContext();
+
+export const AuthProvider = ({children}) =>{
+
+    return (
+        <AuthContext.Provider value={}>
+            {children}
+        </AuthContext.Provider>
+    );
+}
+
+export const useAuth = ()=>{
+    const authContextValue = useContext(AuthContext);
+    if(!authContextValue){
+        throw new Error("useAuth used outside the Provider")
+    }
+    return authContextValue;
+}
+
+-> The above piece of code we have to learn in any case.
+-> Now we add some code to store token in localstorage.
+
+import { createContext, useContext, useEffect, useState } from "react";
+export const AuthContext = createContext();
+export const AuthProvider = ({children}) =>{
+    const[token, setToken] = useState(localStorage.getItem("token"));
+
+    // Storing Tokens in our Local Storage
+    const storeTokenInLocalStorage = (serverToken)=>{
+        setToken(serverToken);
+        return localStorage.setItem("token", serverToken);
+    };
+
+    return (
+        <AuthContext.Provider value={{storeTokenInLocalStorage}}>
+            {children}
+        </AuthContext.Provider>
+    );
+}
+
+export const useAuth = ()=>{
+    const authContextValue = useContext(AuthContext);
+    if(!authContextValue){
+        throw new Error("useAuth used outside the Provider")
+    }
+    return authContextValue;
+}
+
+
+-> Now we have to tell the main.jsx file that we have global file.
+-> We have to import the AuthProvider in main.jsx file.
+-> We have to wrap the App component with AuthProvider.
+-> Now we have to use the useAuth hook in our App component.
+-> Now we have to use the useAuth hook in our login component.
+
+import { AuthProvider } from './store/auth.jsx'
+ReactDOM.createRoot(document.getElementById('root'))
+  .render(
+    <AuthProvider>
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    </AuthProvider>
+  )
+
+
+
+
+
+
+STEP 22: How to LOGOUT in our MERN Stack + Toggle Login Logout Button in Navbar
+===============================================================================
+
+-> Establish the logout route and invoke the logout function within our logout file, defining it in the context API.
+-> We have to invoke the logout function in our logout component.
+
+import { useEffect } from "react";
+import { useAuth } from "../store/auth";
+import { Navigate } from "react-router-dom";
+
+export const Logout = () => {
+  const { LogoutUser } = useAuth();
+
+  useEffect(() => {
+    LogoutUser();
+  }, [LogoutUser]);
+
+  return <Navigate to="/login" />;
+};
+
+-> Now we need to define LogoutUser in auth.jsx file.
+import { useState } from "react";
+
+export const AuthProvider = ({ children }) => {
+  const [token, setToken] = useState("");
+
+  //function to stored the token in local storage
+
+  //   this is the get the value in either true or false in the original state of token
+  let isLoggedIn = !!token;
+  console.log("token", token);
+  console.log("isLoggedin ", isLoggedIn);
+
+  //   to check whether is loggedIn or not
+  const LogoutUser = () => {
+    setToken("");
+    return localStorage.removeItem("token");
+  };
+
+  return (
+    <AuthContext.Provider value={{ isLoggedIn, LogoutUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+-> The isLoggedIn variable is being set to true if token exists and false if it doesn't. The LogoutUser function is responsible for clearing the token from both state (setToken("")) and local storage (localStorage.removeItem("token")).
+
+-> Additionally, to achieve the desired appearance of the navbar, we'll need to make updates. The approach is straightforward – create a variable and assign the token value to it.
+
+-> Go to navbar.jsx and make changes as-
+import { useAuth } from "../store/auth";
+
+export const Navbar = () => {
+  const { isLoggedIn } = useAuth();
+  console.log("login or not ", isLoggedIn);
+  return (
+    <>
+      <header>
+        <div className="container">
+          <nav>
+            <ul>
+              {isLoggedIn ? (
+                <li>
+                  <NavLink to="/logout">Logout</NavLink>
+                </li>
+              ) : (
+                <>
+                  <li>
+                    <NavLink to="/register"> Register </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/login"> Login </NavLink>
+                  </li>
+                </>
+              )}
+            </ul>
+          </nav>
+        </div>
+      </header>
+    </>
+  );
+};
+
+
+
+
+
+
+STEP 23: JWT Token Verification Middleware + Creating Route to Get User Data from DB
+====================================================================================
+
+-> We need to create the auth-middleware, which serves to verify the JWT.
+-> The verification process involves a straightforward comparison with the secret key, using the actual token sent from the frontend.
+-> Initially, let's establish the route for users. This enables the frontend to retrieve user details upon successful verification of the JWT token.
+
+-> Go to auth-router.js file and create a new route for user as
+router.route("/user").get(authMiddleware, authControllers.user);
+
+now you can see we have authMiddleware. We need to set-up that.
+But before that let's set-up our controller for user.
+
+const user = async (req, res) => {
+  try {
+    // const userData = await User.find({});
+    const userData = req.user;
+    console.log(userData);
+    return res.status(200).json({ msg: userData });
+  } catch (error) {
+    console.log(` error from user route ${error}`);
+  }
+};
+
+-> here we can see req.user is not defined, we need to define it. And also keep in mind that we need to create auth-middleware also. Inside that we are creating req.user.
+-> npm i jsonwebtoken
+
+const jwt = require("jsonwebtoken");
+const User = require("../models/user-model")
+
+const authMiddleware = async (req, res, next)=>{
+    const token = req.header("Authorization");
+
+    if(!token){
+        // if you attempt to use an expired token, then you'll receive a "401 authorized response"
+        return res.status(401).json({msg: "Unauthorized HTTP, token not provided"})
+    }
+    
+    // removing the Bearer prefix of our token
+    const jwtToken = token.replace("Bearer", "").trim();
+
+    try{
+        const isVerified = jwt.verify(jwtToken, process.env.JWT_SECRET_KEY);
+        const userData = await User.findOne({email: isVerified.email}).select({password:0});
+        console.log(userData);
+
+        req.user = userData;
+        req.token = jwtToken;
+        req.userID = userData._id;
+
+        next();
+    }catch(error){
+        return res.status(401).json({msg: "Unauthorized, invalid token"})
+    }
+}
+
+module.exports = authMiddleware;
+
+
+-> req.header("Authorization"); this line you remember when we work on postman
+-> jwt.verify(token, secret_key);  it takes two parameter
+
+-> by writing req.user, req.token, req.userID, we can easily get that value when we write try catch block and inside that we write req, res in lambda function, that time by writing the same line {req.user}, we can get that particular value;
+
+
+In Express.js, req (request) object is an object that contains information about the HTTP request. By adding custom properties to req, you can pass information between middleware functions or make it available in your route handlers.
+
+In your authMiddleware:
+
+req.token: This property is storing the JWT token extracted from the request header. You might use it later to perform additional actions or validations.
+
+req.user: This property is storing the user data fetched from the database based on the information stored in the JWT token. It allows you to access user-related information in subsequent middleware functions or route handlers. This is often used to identify the authenticated user.
+
+req.userID: This property is storing the _id of the authenticated user. It provides a convenient way to access the user's ID in your route handlers.
+
+
+
+
+
+
+
+STEP 24: Authentication in MERN App | Auto-Fill Contact Fields with User Data from the Database
+===============================================================================================
+-> In our main authentication store, we'll use the user route to fetch details of the currently logged-in user.
+-> Add code as-
+const [user, setUser] = useState("");
+
+const userAuthentication = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/user", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // our main goal is to get the user data 👇
+        setUser(data.userData);
+      } else {
+        console.error("Error fetching user data");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    userAuthentication();
+  }, []);
+
+  return (
+    <AuthContext.Provider
+      value={{ isLoggedIn, storeTokenInLS, LogoutUser, user }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+
+-> On our main contact page, we'll grab the user data using useAuth. If the user data is available, we'll fill in the input fields; otherwise, we'll leave them empty.
+-> Add code as-
+
+import { useState } from "react";
+import { useAuth } from "../store/auth";
+
+export const Contact = () => {
+  const [data, setData] = useState(defaultContactFormData);
+
+  const { user } = useAuth();
+
+  console.log("frontend user ", user.email);
+
+  const [userData, setUserData] = useState(true);
+
+  if (userData && user) {
+    setData({
+      username: user.username,
+      email: user.email,
+      message: "",
+    });
+    setUserData(false);
+  }
+
+  const handleInput = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    setData({
+            ...contact,
+            [name]: value,
+        });
+  };
+}
+
+
+
+
+
+STEP 25: Store User Message to MongoDB Database
+===============================================
+-> We'll create a new function called `handleFormSubmit` that will be called when the form is submitted. This function will send a POST request to our MongoDB database to store the user's message.
+-> Add code as-
+
+const [data, setData] = useState(defaultContactFormData);
+
+const { user } = useAuth();
+const handleContactForm = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:5000/api/form/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      console.log("response: ", response);
+      // alert(response);
+
+      if (response.ok) {
+        setData(defaultContactFormData);
+        const responseData = await response.json();
+        alert(responseData);
+        console.log(responseData);
+      } else {
+        // Handle API error here
+        console.error("API Error:", response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+
+
+
+
+STEP 26: Building Service Page Backend - Schema, Model, Route, and Controller
+=============================================================================
+-> First Create a Model
+const mongoose = require("mongoose");
+
+const serviceSchema = new mongoose.Schema({
+    service:{type:String, required: true},
+    description:{type:String, required: true},
+    price:{type:String, required: true},
+    provider:{type:String, required: true}
+});
+
+const Service = new mongoose.model("Service", serviceSchema);
+
+module.exports = Service;
+
+-> Second Create a Router
+
+const express = require("express");
+const services = require("../controllers/service-controller");
+const router = express.Router();
+
+router.route("/service").get(services);
+
+module.exports = router;
+
+-> Define Router in controller
+const Service = require("../models/service-model");
+
+const services = async (req, res)=>{
+    try {
+        const response = await Service.find().exec();
+        if(!response){
+            res.status(404).json({"msg": "No service found"});
+            return ;
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+module.exports = services;
+
+
+-> Set server.js
+const serviceRouter = require("./router/service-router");
+app.use("/api/data", serviceRouter);
+
+
+
+
+
+
+
+STEP 27: Creating Dynamic Cards by Fetching Backend Services Data with React
+============================================================================
+
+-> Add the functionality in the auth.jsx file to get the services data in our frontend & we will store it in our services state variable.
+-> Our main service page to show all the cards
+
+import { useAuth } from "../store/auth"
+
+export const Services = () => {
+    const { services } = useAuth();
+    if (!services) {
+        return <div>Loading...</div>; // or some other fallback content
+    }
+    return (
+        <section className="services-page">
+            {services.map((curElem, index)=>{
+                const {service, description, price, provider} = curElem;
+                return (
+                    <div className="service-container">
+                        <div className="service-image">
+                            <img src="/images/login.jpg" alt="images" width="228" />
+                        </div>
+                        <div className="service-content">
+                            <div className="first-row">
+                                <div>{service}</div>
+                                <div>{price}</div>
+                            </div>
+                            <div className="second-row">
+                                <div className="provider">{provider}</div>
+                                <div>{description}</div>
+                            </div>
+                        </div>
+                    </div>
+                )
+            })}
+        </section>
+    )
+}
+
+-> As you can see, we need to define "const { services } = useAuth();" this part.
+-> We need to define the services state in our auth.js file.
+-> We need to fetch the services data from the backend in our auth.js file.
+
+-> Go to auth.jsx and add code as
+
+const[services, setServices] = useState([]);
+const getServices = async ()=>{
+    try {
+        const response = await fetch("http://localhost:5000/api/data/service",{
+            method: "GET",
+        })
+        if(response.ok){
+            const data = await response.json();
+            // console.log(data);
+            setServices(data);
+        }
+    } catch (error) {
+        console.log(`service error: ${error}`);
+    }
+}
+
+useEffect(()=>{
+    getServices();
+    userAuthentication();
+}, []);
+
+
+
+
+
+

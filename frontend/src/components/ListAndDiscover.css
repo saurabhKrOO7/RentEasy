@@ -1,0 +1,155 @@
+.list-discover-container {
+    display: flex;
+    flex-wrap: wrap; /* Ensures content wraps to the next row */
+    gap: 2rem;
+    font-family: Poppins, sans-serif;
+    margin: 2rem auto;
+    width: 80%;
+    background-color: white;
+  }
+  
+  /* Section Styles */
+  .list-discover-section {
+    flex: 1 1 calc(50% - 2rem); /* Take 50% width minus gap and allow shrinking */
+    height: 100vh; /* Set a consistent height for both sections */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align content to the top */
+    padding: 20px;
+    border-radius: 10px;
+    position: relative; /* Allows overlays to stay properly positioned */
+    box-sizing: border-box; /* Prevents padding from affecting the layout */
+    overflow: hidden; /* Ensures overlay doesn't overflow */
+  }
+  
+  /* Responsive Media Query */
+  @media (max-width: 1024px) {
+    .list-discover-section {
+      flex: 1 1 100%; /* Take full width in smaller screens */
+      height: 600px; /* Allow height to adjust naturally */
+    }
+  
+    .list-discover-container {
+      gap: 1rem; /* Reduce gap for smaller screens */
+    }
+  }
+  
+  /* Overlay for Text and Buttons */
+  .list-discover-overlay {
+    position: absolute; /* Make the overlay positionable relative to its parent */
+    top: 70px; /* Add some spacing from the top */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Center overlay content */
+    color: #fff;
+    text-align: center;
+    padding: 10px 20px;
+    /* max-width: 90%; */
+    z-index: 10; /* Ensure it stays on top of the background image */
+    width: 100%;
+  }
+  
+  .list-discover-heading {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  
+  .list-discover-text {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+  
+  .list-discover-btn {
+    background-color: white;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 58px;
+    font-family: poppins;
+  }
+  
+  .list-discover-btn:hover {
+    background-color: #e0a800;
+  }
+  
+  .list-discover-search-bar {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .list-discover-input {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    width: 120px;
+  }
+  
+  .list-discover-search-btn {
+    background-color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+
+
+
+  .abc-unique-search-bar {
+    position: absolute;
+    bottom: -90px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+    background-color: white;
+    /* padding: 10px 15px; */
+    border-radius: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 80%;
+    height: 3.5rem;
+    z-index: 3;
+  }
+  .abc-unique-search-bar-container{
+    display: flex;
+    justify-content:left;
+    align-items: center;
+    margin: 0 1rem;
+  }
+  .abc-unique-search-divider {
+    width: 1px;
+    height: 30px;
+    background-color: #ccc;
+    margin: 0 10px;
+  }
+  
+  .abc-unique-search-input,
+  .abc-unique-location-input {
+    flex: 1;
+    border: none;
+    padding: 10px;
+    /* margin: 0 15px; */
+    border-radius: 25px;
+    font-size: 1rem;
+    outline: none;
+    width: 5rem;
+    /* background: #f0f0f0; */
+  }
+  
+  .abc-unique-search-button {
+    background-color: #ffcc00;
+    border: none;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #fff;
+    font-weight: bold;
+  }
+  .abc-unique-search-button:hover {
+    background-color: #ffcc00d8;
+  }

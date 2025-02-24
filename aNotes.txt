@@ -1,0 +1,829 @@
+// STEP 1 
+First i have created a folder structure by running following command
+my-movies % npx create-vite frontend --template react
+
+then move back from the frontend directory and there initialise package
+my-movies % npm init --y
+
+then installed required packages
+my-movies % npm i bcryptjs body-parser concurrently cookie-parser dotenv express 
+jsonwebtoken mongoose multer nodemon
+
+then again go to fronted folder and then run following command
+frontend % npm i react-icons react-redux @reduxjs/toolkit react-router react-rout
+er-dom react-slick react-toastify slick-carousel
+
+
+// STEP 2 : adding scripts
+In package.json (universal) we have added scripts to run backend and frontend
+Also add type: module before adding script as: 
+"type": "module",
+"scripts": {
+    "fullstack": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "nodemon backend/.js",
+    "frontend": "cd frontend && npm run dev"
+}
+
+
+
+// STEP 3 : gitignore
+add command: /node_modules
+
+// STEP 4 : .env
+add the following command
+POST=3000
+MONGO_URI='mongodb://127.0.0.1:27017/mern_admin'
+JWT_SERCRET=ASDFGHJK12345678
+NODE_ENV = 'development'
+
+// STEP 5 : create folder structure for backend
+create folder in backend folder as:
+config, controllers, middlewares, models, routes, utils.
+make file name index.js
+
+
+// STEP 6
+go to backend/config folder, and there create a file called db.js
+in this file we will connect to the database
+
+import mongoose, { mongo } from "mongoose";
+
+const connectDB = async ()=>{
+    try {
+        await mongoose.connect(process.env.MONGO_URI)
+        console.log(`Successfully connected to DB 👍`)
+    } catch (error) {
+        console.error(`Error: ${error.message}`);
+        process.exit(1);
+    }
+}
+
+this is the basic line of code require to connect to mongoDB database
+
+
+// STEP 6  do setup in index.js
+Go back to index.js file in backend folder and add the following command to start the server
+
+// Packages
+import express from "express";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+import path from "path";
+
+// Files
+import connectDB from "./config/db.js";
+
+// Configuration
+dotenv.config();
+connectDB();
+
+const app = express();
+
+// Middlewares
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
+app.use(cookieParser())
+
+const PORT = process.env.PORT || 3000;
+
+// Routes
+app.listen(PORT, ()=>console.log(`Server is running at PORT: ${PORT}`))
+
+
+
+// STEP 7 install tailwind css
+go to your terminal and run the following command in frontend folder
+
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+this will install tailwindcss and its dependencies and also create a tailwind.config.js file in your
+
+go to tailwind.config.js file and add the following command
+content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+],
+
+now go to index.css file and add the following command
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+-------- This is all about setup for developing gand faad project -------
+
+
+
+--------------USER MANAGEMENT (BACKEND)---------------
+
+STEP 8: Create a model for User
+go to models folder and create a new file called User.js
+inside that write the following command
+
+import mongoose from "mongoose";
+
+const userSchema = mongoose.Schema({
+    username:{
+        type: String,
+        required: true,
+        unique: true
+    },
+    email:{
+        type: String,
+        required: true,
+        unique: true
+    },
+    password:{
+        type: String,
+        required: true
+    },
+    isAdmin:{
+        type: Boolean,
+        default: false
+    },
+},
+{timestamps: true}
+);
+
+const User = mongoose.model("User", userSchema);
+export default User;
+
+
+STEP 9: Create router
+go to routes folder and create a new file called userRoutes.js
+inside that write the following command
+
+import express from "express";
+
+// controllers
+import { createUser } from "../controllers/userController.js";
+
+// middlewares
+
+const router = express.Router();
+
+router.route("/").post(createUser);
+
+export default router;
+
+
+STEP 10: create Router
+Go to routes folder and create file userRoutes.js
+inside that write the following command
+
+import express from "express";
+
+// controllers
+// middlewares
+
+const router = express.Router();
+
+router.route("/").POST(createUser);
+
+export default router;
+
+Since i have created a router, but after that we definitely need to define 
+our controller.
+But before that we need to take care of tokens, asynchronous handlers, etc
+
+STEP 11: Create Middleware (asyncHandler)
+Create a new file called asyncHandler.js inside middleware folder
+inside that write the following command
+
+const asyncHandler = (fn) => (req, res, next) => {
+    Promise.resolve(fn(req, res, next)).catch((error)=>{
+        res.status(500).json({message: error.message});
+    })
+}
+
+export default asyncHandler;
+
+This middleware will help us to handle asynchronous functions and also
+handle errors in a better way.
+
+
+
+STEP 12: Create middleware (authMiddleware.js)
+Create a new file called authMiddleware.js inside middleware folder
+inside that write the following command
+
+import jwt from 'jsonwebtoken'
+import User from '../models/User.js'
+import asyncHandler from './asyncHandler.js'
+
+// Check if the user is authenticated or not
+const authenticate = asyncHandler(async (req, res, next)=>{
+    let token;
+
+    // Read JWT from the 'jwt' cookie
+    token = req.cookies.jwt;
+
+    if(token){
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            // below line will give the whole data except password;
+            // if it is successfully decoded.
+            req.user = await User.findById(decoded.userID).select("-password");
+            next();
+        } catch (error) {
+            res.status(401);
+            throw new Error("Not authorized, token failed.")
+        }
+    }else{
+        res.status(401);
+        throw new Error("Not authorized, no token");
+    }
+})
+
+// Check if user is admin or not
+const authorizeAdmin = (req, res, next)=>{
+    if(req.user && req.user.isAdmin){
+        next();
+    }else{
+        res.status(401).send("Not authorized as an Admin");
+    }
+};
+
+export {authenticate, authorizeAdmin};
+
+
+
+STEP 13: Create token
+Create a new file called createToken.js inside utils folder
+inside that write the following command
+
+import jwt from "jsonwebtoken";
+
+const generateToken = (res, userID) =>{
+    const token = jwt.sign({userID}, process.env.JWT_SECRET, {expiresIN: "30d"});
+
+    // Set the token in jwt HTTP-only cookie
+    res.cookie('jwt', token, {
+        httpOnly: true,  // This means the cookie can only be accessed by the server and not by client-side JavaScript. prevent XSS attacks. 
+        secure: process.env.NODE_ENV != "development",  // cookie will only be transmitted over a secure protocol (HTTPS) if the application is not in development mode
+        sameSite: "strict",  // cookie will only be sent in a request if the request is from the same site that set the cookie. prevent CSRF attacks.
+        maxAge: 30*24*60*60*1000,  // it's set to 30 days. After this time, the cookie will expire and will no longer be sent in requests.
+    });
+
+    return token;
+}
+
+export default generateToken;
+
+
+
+STEP 14: finally create userController.js file
+inside that write the following code
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import asyncHandler from "../middlewares/asyncHandler.js";
+import createToken from "../utils/createToken.js";
+
+const createUser = asyncHandler(async(req, res)=>{
+    const {username, email, password} = req.body;
+
+    console.log(username);
+    console.log(email);
+    console.log(password);
+});
+
+export {createUser};
+
+
+
+STEP 15: finally index.js file
+add following code 
+
+import userRoutes from "./routes/userRoutes.js";
+app.use("/api/v1/users", userRoutes);
+
+
+
+STEP 16: Create users
+create a new user by sending a POST request to http://localhost:3000/api/v1/users
+with the following data
+
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import asyncHandler from "../middlewares/asyncHandler.js";
+import createToken from "../utils/createToken.js";
+
+const createUser = async(req, res)=>{
+    const {username, email, password} = req.body;
+    
+    if(!username || !email || !password){
+        throw new Error("Please fill all the fields");
+    }
+
+    const userExists = await User.findOne({email});
+    if(userExists){
+        return res.status(400).send("User already exists");
+    }
+
+    // Hash the user password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = new User({username, email, password:hashedPassword});
+    console.log(newUser);
+    try{
+        await User.create(newUser);
+        // or we can also write 
+        // await newUser.save();
+
+        createToken(res, newUser._id);
+        res.status(201).json({
+            _id: newUser._id,
+            username: newUser.username,
+            email: newUser.email,
+            isAdmin: newUser.isAdmin,
+        });
+    }catch(error){
+        res.status(400).json({message: error.message})
+    }
+};
+
+export {createUser};
+
+
+STEP 17: Route for Login user
+go to userRouter.js file and create a route for login user as: 
+
+router.post("/auth", loginUser);
+
+then we have to define loginUser in userController.js file
+
+const loginUser = asyncHandler(async(req, res)=>{
+    const {email, password} = req.body;
+    if(!email || !password){
+        throw new Error("Please fill all the fields");
+    }
+
+    const existingUser = await User.findOne({email});
+
+    if(existingUser){
+        const isValidPassword = await bcrypt.compare(password, existingUser.password);
+
+        if(isValidPassword){
+            createToken(res, existingUser._id)
+            res.status(201).json({
+                _id: existingUser._id,
+                username: existingUser.username,
+                email: existingUser.email,
+                isAdmin: existingUser.isAdmin
+            });
+        }else{
+            return res.status(401).json({message: "Invalid Password"});
+        }
+    }else{
+        return res.status(401).json({message: "User not found"});
+    }
+
+});
+
+don't foreget to export it after defining.
+
+
+STEP 18: Route for LogOut user
+go to userRouter.js file and create a route for logout user as:
+router.post("/logout", logoutCurrentUser);
+
+then we have to define logoutCurrentUser in userController.js file
+
+const logoutCurrentUser = asyncHandler(async(req, res)=>{
+    res.cookie('jwt', '', {
+        httpOnly: true,
+        expires: new Date(0)
+    });
+
+    res.status(200).json({message: "Logged out successfully"})
+})
+
+
+
+STEP 19: Get all user info, if you are a user
+go to userRouter.js file and create a route for get all user info as:
+router
+    .route("/")
+    .post(createUser)
+    .get(authenticate, authorizeAdmin, getAllUsers);
+
+then we have to define getAllUsers in userController.js file
+
+const getAllUsers = asyncHandler(async(req, res)=>{
+    const users = await User.find({});
+    console.log(users);
+    res.json(users);
+});
+
+
+
+STEP 20: Get specific user profile
+go to userRouter.js file and create a route for get specific user profile as:
+
+router.route("/profile").get(authenticate, getCurrentUserProfile);
+
+then we have to define getCurrentUserProfile in userController.js file
+
+const getCurrentUserProfile = asyncHandler(async(req, res)=>{
+    const user = await User.findById(req.user._id);
+
+    if(user){
+        res.json({
+            _id: user._id,
+            username: user.username,
+            email: user.email
+        })
+    }else{
+        res.status(400)
+        throw new Error("User not found.")
+    }
+})
+
+
+STEP 30: Update user info
+go to userRouter.js file and create a route for update user info as:
+
+router
+    .route("/profile")
+    .get(authenticate, getCurrentUserProfile)
+    .put(authenticate, updateCurrentUserProfile);
+
+then we have to define updateCurrentUserProfile in userController.js file
+
+const updateCurrentUserProfile = asyncHandler(async(req, res)=>{
+    const user = await User.findById(req.user._id);
+
+    if(user){
+        user.username = req.body.username || user.username;
+        user.email = req.body.email || user.email;
+
+        if(req.user.password){
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(req.body.password, salt);
+            user.password = hashedPassword;
+        }
+        const updatedUser = await user.save();
+        res.json({
+            _id: updatedUser._id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            isAdmin: updatedUser.isAdmin
+        });
+    }else{
+        res.status(404)
+        throw new Error("user not found")
+    }
+})
+
+----------------END OF USER MANAGEMENT-------------------
+
+
+----------------REDUX TOOLKIT & RTX QUERY SETUP-----------
+
+STEP 31: vite.config.js
+make changes in vite.config.js
+
+server:{
+    proxy:{
+      "/api/" : "http://localhost:3000",
+      "/uploads": "http://localhost:3000",
+    },
+  },
+add the above line just below the plugins.
+
+
+STEP 32: Create folder structure
+
+go to src and create folder name components and inside create file Loader.jsx
+create another folder pages and inside that folder create another folder Auth,User
+create another folder redux and inside that create another folder api, features
+inside features, create a folder auth
+create a file store.js inside redux folder
+
+
+STEP 33: store.js
+go to store.js and add the following command
+
+import { configureStore } from "@reduxjs/toolkit";
+import {setupListeners} from "@reduxjs/toolkit/query/react"
+import authReducer from './features/auth/authSlice'
+import { apiSlice } from "./api/apiSlice";
+
+const store = configureStore({
+    reducer: {
+        [apiSlice.reducerPath] : apiSlice.reducer,
+        auth: authReducer,
+    },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiSlice.middleware),
+    devTools: true
+});
+
+setupListeners(store.dispatch);
+export default store;
+
+
+STEP 34: main.jsx
+
+import { createRoot } from 'react-dom/client'
+import App from './App.jsx'
+import "./index.css";
+
+import store from './redux/store.js'
+import { Provider } from 'react-redux';
+import {Route, createRoutesFromElements} from 'react-router'
+import { RouterProvider } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
+import ReactDOM from 'react-dom/client'
+
+// Auth
+
+
+// Restricted
+
+
+import Home from './pages/Home.jsx';
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<App />}>
+      <Route index={true} path='/' element={<Home/>} />
+    </Route>
+  )
+)
+
+// Uncaught SyntaxError: The requested module '/node_modules/.vite/deps/react-router.js?v=4c6a423a' does not provide an export named 'RouteProvider' (at main.jsx:7:16) 
+// why i am getting error as the requested module does not provide an export named 'RouteProvider'?
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <Provider store={store}>
+    <RouterProvider router={router}/>
+  </Provider>
+)
+
+
+
+STEP 35: authSlice.js
+
+import { createSlice } from "@reduxjs/toolkit";
+
+const initialState={
+    userInfo: localStorage.getItem('userInfo')
+    ?JSON.parse(localStorage.getItem('userInfo'))
+    :null,
+};
+
+const authSlice = createSlice({
+    name: "auth",
+    initialState,
+    reducers:{
+        setCredentials: (state, action) =>{
+            state.userInfo = action.payload;
+            localStorage.setItem('userInfo', JSON.stringify(action.payload));
+
+            const expirationTime = new Date(). getTime() + 30*24*60*60*1000;
+            localStorage.setItem("expirationTime", expirationTime);
+        },
+
+        logout: (state) =>{
+            state.userInfo = null;
+            localStorage.clear();
+        }
+    }
+});
+
+export const {setCredentials, logout} = authSlice.actions
+export default authSlice.reducer;
+
+
+
+STEP 36: constants.js
+crate a file constants.js inside redux folder
+
+export const BASE_URL = "";
+export const USERS_URL = `api/v1/users`;
+
+
+
+STEP 37: apiSlice.js
+
+import { fetchBaseQuery, createApi } from "@reduxjs/toolkit/query/react";
+import {BASE_URL} from '../constants'
+
+const baseQuery = fetchBaseQuery({baseUrl: BASE_URL});
+
+export const apiSlice = createApi({
+    baseQuery,
+    endpoints: () => ({}),
+});
+
+
+
+STEP 38: user.js
+create folder user.js inside api
+import { apiSlice } from "./apiSlice";
+import { USERS_URL } from "../constants";
+
+export const useApiSlice = apiSlice.injectEndpoints({
+    endpoints: (builder) => ({
+        login: builder.mutation({
+            query: (data)=>({
+                url: `${USERS_URL}/auth`,
+                method: 'POST',
+                body: data,
+            })
+        })
+    })
+});
+
+export const {useLoginMutation} = useApiSlice;
+
+
+
+STEP 39: App.jsx
+import { Outlet } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Navigation from "./pages/Auth/Navigation";
+
+const App = () => {
+  return (
+    <>
+      <ToastContainer/>
+        <Navigation/>
+        <main className="py-3">
+          <Outlet/>
+        </main>
+    </>
+  )
+}
+
+export default App
+
+
+-----------------Working on Frontend---------------
+STEP 40: Navigation.jsx
+
+import { useState } from "react"
+import{AiOutlineHome, AiOutlineLogin, AiOutlineUserAdd} from "react-icons/ai"
+import {MdOutlineLocalMovies} from "react-icons/md"
+import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import { useSelector, useDispatch } from "react-redux"
+import { useLoginMutation } from "../../redux/api/user"
+import { logout } from "../../redux/features/auth/authSlice"
+
+const Navigation = () => {
+  const { userInfo } = useSelector((state) => state.auth);      
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // const [logoutApiCall] = useLogoutMutation();
+
+  // const logoutHandler = async () => {
+  //   try {
+  //     await logoutApiCall().unwrap();
+  //     dispatch(logout());
+  //     navigate("/login");
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  return (
+    <div>
+      <section>
+
+        {/* Section 1 */}
+
+        <div>
+          <Link to="/">
+            <AiOutlineHome/>
+            <span className="hidden">Home</span>
+          </Link>
+
+          <Link to="/movies">
+            <MdOutlineLocalMovies /> 
+            <span className="hidden">SHOP</span>
+          </Link>
+        </div>
+
+        
+        {/* Section 2 */}
+
+        <div>
+          <button onClick={toggleDropdown}>
+            {userInfo ? (
+              <span>{userInfo.username}</span>
+            ) : (
+              <></>
+            )}
+
+            {userInfo && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-4 w-4 ml-1 ${
+                  dropdownOpen ? "transform rotate-180" : ""
+                }`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="white"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d={dropdownOpen ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"}
+                />
+              </svg>
+            )}
+          </button>
+
+          {dropdownOpen && userInfo && (
+            <ul
+              className={`absolute right-0 ${
+                !userInfo.isAdmin ? "-top-20" : "-top-24"
+              }`}
+            >
+              {userInfo.isAdmin && (
+                <>
+                  <li>
+                    <Link to="/admin/movies/dashboard">
+                      Dashboard
+                    </Link>
+                  </li>
+                </>
+              )}
+
+              <li>
+                <Link to="/profile">
+                  Profile
+                </Link>
+              </li>
+
+              <li>
+                <button onClick={logoutHandler}>
+                  Logout
+                </button>
+              </li>
+            </ul>
+          )}
+
+          {!userInfo && (
+            <ul className="flex">
+              <li>
+                <Link to="/login">
+                  <AiOutlineLogin/>
+                  <span className="hidden">LOGIN</span>
+                </Link>
+              </li>
+
+              <li>
+                <Link to="/register">
+                  <AiOutlineUserAdd />
+                  <span className="hidden ">REGISTER</span>
+                </Link>
+              </li>
+            </ul>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Navigation
+
+
+
+STEP 41: Create a login and register router in main.jsx file
+
+import Login from "./pages/Auth/Login.jsx";
+import Register from './pages/Auth/Register.jsx';
+
+<Route path='/login' element={<Login/>} />
+<Router path='/register' element={<Register/>} />
+
+
+
+
+STEP 41: Working on register.jsx file
+
+for that first of all we need to create register mutation inside
+/redux/api/user.js
+
+add the following line just below the login mutation
+register: builder.mutation({
+    query: (data)=>({
+        url: `${USERS_URL}`,
+        method: "POST",
+        body: data,
+    })
+})
+

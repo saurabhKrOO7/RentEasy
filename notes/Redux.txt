@@ -1,0 +1,108 @@
+after creating vite we need to install redux
+STEP 1: Install redux
+
+my-rdx % npm i @reduxjs/toolkit react-redux
+
+
+STEP 2: Creating store
+create a folder inside src/app and create a file name store.js
+
+import {configureStore} from "@reduxjs/toolkit"
+
+export const store = configureStore({
+    reducer: {},
+})
+
+above is the template to creating a store.
+Now we need to provide this store
+
+
+STEP 3: Provide store
+to do so we nee to import that store in main.jsx and
+enclose the <App/> component with <Provider>.
+
+import { store } from './app/store.js'
+import {Provider} from 'react-redux'
+
+createRoot(document.getElementById('root')).render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+)
+
+
+STEP 4: Creating reducer / slice
+create a folder inside src/app/features/counter and create a file name counterSlice.js
+
+import { createSlice } from "@reduxjs/toolkit";
+
+// const initialState = {value: 0};
+
+export const counterSlice = createSlice({
+    name: "counter",
+    initialState: {value: 0},
+    // or we can do it that way also, create const initialState above and then initialState: initialState,
+    reducers:{
+        increment: (state)=>{
+            state.value += 1;
+        },
+        decrement: (state)=>{
+            state.value -=1 ;
+        }
+    }
+})
+
+export const {increment, decrement} = counterSlice.actions
+export default counterSlice.reducer;
+
+Since we have created a slice, then we need to make use of it.
+that's why we need to add that slice in store.js file, and it become
+responsibility of store.js file to make available for all the files.
+
+STEP 5: add counterSlice
+go to store.js file and add your slice.
+
+import {configureStore} from "@reduxjs/toolkit"
+import counterReducer from "./features/counter/counterSlice"
+
+export const store = configureStore({
+    reducer: {
+        counter: counterReducer
+    },
+})
+
+Now the final part is how we are attaching this logic in our project
+so that we can see the effect of our counterSlice.
+we need to make use of useSelector and useDispatch hook.
+useSelector is used to get the state from the store and useDispatch is used to dispatch the action.
+we need to import these hooks from react-redux.
+
+
+STEP 6: Counter.jsx
+import { useSelector, useDispatch } from "react-redux";
+import { increment, decrement } from "../features/counter/counterSlice";
+
+import React from 'react'
+
+const Counter = () => {
+    // Read the data from the store
+    // counter is the variable that we created inside store.js
+    // value is the varible inside counterSlice.js file
+    const count = useSelector((state)=>state.counter.value);
+
+    // Changing the data by sending "actions" to the store
+    const dispatch = useDispatch();
+  return (
+    <>
+        <h1>{count}</h1>
+        <button onClick={()=>dispatch(increment())}>+</button>
+        <button onClick={()=>dispatch(decrement())}>-</button>
+    </>
+  )
+}
+
+export default Counter
+
+
+
+----------------------- END OF REDUX ------------------------

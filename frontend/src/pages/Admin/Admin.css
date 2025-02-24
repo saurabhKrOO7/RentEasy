@@ -1,0 +1,11 @@
+.nav___link{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+    width: 13rem;
+    background-color: rgb(23, 28, 39);
+}
+.nav___link li{
+    margin: 1rem;
+}

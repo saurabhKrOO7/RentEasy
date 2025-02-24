@@ -1,0 +1,29 @@
+
+.favorite-icon {
+    cursor: pointer;
+  }
+  
+  .icon {
+    font-size: 1.25rem; /* Adjust icon size if needed */
+    transition: opacity 0.3s ease;
+  }
+  
+  .icon.heart-filled {
+    color: #ec4899; /* Corresponds to text-pink-500 in Tailwind */
+    font-size: 2rem;
+}
+
+.icon.heart-outline {
+    color: black; /* Corresponds to text-white in Tailwind */
+    font-size: 2rem;
+  }
+  
+  /* Display the appropriate icon based on the isFavorite state */
+  .favorite-icon.active .heart-filled {
+    display: inline; /* Show filled heart icon if active */
+  }
+  
+  .favorite-icon:not(.active) .heart-outline {
+    display: inline; /* Show outline heart icon if not active */
+  }
+  

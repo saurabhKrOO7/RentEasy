@@ -1,0 +1,14 @@
+export const BASE_URL = "";
+export const USERS_URL = "/api/users";
+export const CATEGORY_URL = "/api/category";
+export const PRODUCT_URL = "/api/products";
+export const UPLOAD_URL = "/api/upload";
+export const REVIEW_URL = "/api/reviews";
+export const WISHLIST_URL = "/api/wishlist";
+export const CART_URL = "/api/cart";
+export const PAYPAL_URL = "/api/config/paypal";
+export const ORDERS_URL = "/api/orders";
+export const SELLERS_URL = "/api/seller";
+export const SEND_EMAIL_URL = "/api/send-email";
+export const CONTACT_URL = "/api/contact";
+export const CHAT_URL = "/api/chat";

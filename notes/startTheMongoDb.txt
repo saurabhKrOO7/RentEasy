@@ -1,0 +1,70 @@
+sudo mongod --dbpath=/Users/saurabhkumar/data/db
+
+show dbs  // to show the databases available
+use database_name  // create a new database if not available, if avalibale then work on that
+
+db.collection_name.insertOne({name:"Saurabh", type:"abcd", age:21, active:true})
+
+db // show the currently active data
+show collections // show the total no of collections/records
+
+db.collection_name.find()  // display all the rows in database
+db.collection_name.find().pretty()  //displays in cool way
+
+
+//CRUD OPERATION
+//C
+db.collection_name.insertMany([{}, {}, {} ...... {}])  //insert many rows at a time
+
+//R
+db.collection_name.find(query, projection)  //structure of query in mongose
+
+db.collection_name.find({name : "saurabh"})  //gets result whose name is saurabh in db
+db.collection_name.find({name: "saurabh"}, {name:1})  //displays only name field in entire rows
+db.collection_name.find({name: "saurabh"}, {name:1, _id:0})  //hides the defult id part
+db.collection_name.find({name:"dfad"}).limit(1)   //fetch only first matching query
+db.collection_name.findOne({name: "dafs"})   //does the same work as limit()
+db.collection_name.find({name: "dsf"}).limit(1).skip(1) //fetch second matchin query
+
+
+
+//U
+db.collection_name.updateOne(<filter>, <update>)  
+
+db.collection_name.updateMany({name: "saurabh"}, {$set: {age: 22}})   //update all the matching row with name = saurabh and changes the age to 22
+
+
+//D
+db.collection_name.deleteMany(DELETION_CRITERIA)
+
+db.collection_name.deleteMany({type: "saurabh"})
+db.collection_name.deleteMany({})  //delete entire row from db
+
+
+
+
+
+
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
+import { Route, RouterProvider, createRoutesFromElements } from "react-router";
+import { createBrowserRouter } from "react-router-dom";
+import { Provider } from "react-redux";
+import store from "./redux/store.js";
+
+// Admin Route
+
+// Private Route
+
+// Auth
+
+const router = createBrowserRouter(
+  createRoutesFromElements(<Route path="/" element={<App />}></Route>)
+);
+
+createRoot(document.getElementById("root")).render(
+  <Provider store={store}>
+    <RouterProvider router={router} />
+  </Provider>
+);
