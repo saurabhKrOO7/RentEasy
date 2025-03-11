@@ -63,8 +63,7 @@ const Navigation = () => {
       <nav className="nav container">
         <div className="nav__data">
           <Link to="/" className="nav__logo">
-            <MdClose className="ri-planet-line" />
-            RentEase
+            <img src="/images/logo.png" alt="Logo" />
           </Link>
 
           <div className="nav__toggle" id="nav-toggle">
