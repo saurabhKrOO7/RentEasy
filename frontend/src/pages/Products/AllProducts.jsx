@@ -33,7 +33,6 @@ import { useAddToCartMutation } from "../../redux/api/cartApiSlice.js";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 
-
 // Default locations (backend should provide real ones)
 const locations = ["All", "New York", "Los Angeles", "Chicago", "Miami"];
 
@@ -250,7 +249,7 @@ const AllProducts = () => {
                       product.images.map((img, index) => (
                         <SwiperSlide key={index}>
                           <img
-                            src={img}
+                            src={`https://renteasy-frontend.onrender.com/${img}`}
                             alt={`${product.name} - ${index + 1}`}
                             style={{
                               width: "100%",
