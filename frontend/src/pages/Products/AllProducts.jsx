@@ -32,7 +32,6 @@ import { useAddToCartMutation } from "../../redux/api/cartApiSlice.js";
 
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
-import ProductDetails from "../Products/ProductDetails";
 
 
 // Default locations (backend should provide real ones)
