@@ -38,7 +38,7 @@ const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "https://renteasy-9zfn.onrender.com", // Allow frontend origin
+    origin: "https://renteasy-frontend.onrender.com", // Allow frontend origin
     methods: ["GET", "POST"],
     credentials: true, // Required to allow cookies or authentication headers
   },
@@ -46,7 +46,7 @@ const io = new Server(server, {
 
 app.use(
   cors({
-    origin: "https://renteasy-9zfn.onrender.com",
+    origin: "https://renteasy-frontend.onrender.com",
     credentials: true,
   })
 );
