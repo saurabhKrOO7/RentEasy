@@ -30,7 +30,7 @@ import Register from "./pages/Auth/Register.jsx";
 import Login from "./pages/Auth/Login.jsx";
 
 // Public Route
-import ProductDetails from "./pages/Products/productDetails.jsx";
+import ProductDetails from "./pages/Products/ProductDetails.jsx";
 import Home from "./pages/Home.jsx";
 import Order from "./pages/Order/Order.jsx";
 import Contact from "./components/Contact.jsx";
@@ -50,7 +50,7 @@ const router = createBrowserRouter(
       <Route path="/cart" element={<Cart />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/allproducts" element={<AllProducts />} />
-      <Route path='/become-seller' element={<BecomeSeller />} />
+      <Route path="/become-seller" element={<BecomeSeller />} />
 
       <Route path="" element={<PrivateRoute />}>
         <Route path="/order" element={<Order />} />
