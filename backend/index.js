@@ -46,7 +46,7 @@ const io = new Server(server, {
 
 app.use(
   cors({
-    origin: "https://renteasy-frontend.onrender.com",
+    origin: "https://renteasy-9zfn.onrender.com",
     credentials: true,
   })
 );
