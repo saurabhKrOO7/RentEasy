@@ -38,6 +38,22 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+
+    saveChatMessageFromSeller: builder.mutation({
+      query: (message) => ({
+        url: `${SELLERS_URL}/save-chat`,
+        method: "POST",
+        body: message,
+      }),
+    }),
+
+    updateSeenStatusForSeller: builder.mutation({
+      query: ({ productId }) => ({
+        url: `${CHAT_URL}/${productId}/seen/seller`,
+        method: "PUT",
+      }),
+      invalidatesTags: ["Chat"],
+    }),
   }),
 });
 
@@ -47,4 +63,6 @@ export const {
   useUpdateSeenStatusMutation,
   useGetSellerChatsQuery,
   useGetUnseenMessagesQuery,
+  useSaveChatMessageFromSellerMutation,
+  useUpdateSeenStatusForSellerMutation,
 } = chatApiSlice;

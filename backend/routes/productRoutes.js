@@ -5,6 +5,7 @@ import {
   authenticate,
   authorizeAdmin,
   authorizeSeller,
+  authorizeSellerAndAdmin,
 } from "../middlewares/authMiddleware.js";
 import checkId from "../middlewares/checkId.js";
 
@@ -30,7 +31,12 @@ router.route("/:id/reviews").post(authenticate, checkId, addProductReview);
 router
   .route("/:id")
   .get(fetchProductById)
-  .put(authenticate, authorizeAdmin, formidable(), updateProductDetails)
+  .put(
+    authenticate,
+    authorizeSellerAndAdmin,
+    formidable(),
+    updateProductDetails
+  )
   .delete(authenticate, authorizeAdmin, checkId, removeProduct);
 
 router

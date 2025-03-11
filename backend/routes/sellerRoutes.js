@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-
+import formidable from "express-formidable";
 import {
   authenticate,
   authorizeSeller,
@@ -17,7 +17,9 @@ import {
 import {
   getSellerChats,
   getUnseenMessages,
+  saveChatMessageFromSeller,
 } from "../controllers/chatController.js";
+import { removeProduct } from "../controllers/productController.js";
 
 router.route("/").get(authenticate, authorizeSeller, getSellerEarnings);
 router
@@ -44,5 +46,11 @@ router
 router
   .route("/unseen-chats")
   .get(authenticate, authorizeSeller, getUnseenMessages);
+
+router
+  .route("/save-chat")
+  .post(authenticate, authorizeSeller, saveChatMessageFromSeller);
+
+router.route("/:id").delete(authenticate, authorizeSeller, removeProduct);
 
 export default router;

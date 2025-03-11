@@ -44,6 +44,12 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    becomeSeller: builder.mutation({
+      query: () => ({
+        url: `${USERS_URL}/become-seller`,
+        method: "PUT",
+      }),
+    }),
   }),
 });
 
@@ -54,4 +60,5 @@ export const {
   useAllUsersQuery,
   useUpdateUserByIdMutation,
   useDeleteUserByIdMutation,
+  useBecomeSellerMutation,
 } = usersApiSlice;

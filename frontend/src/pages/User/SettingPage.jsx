@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { useFetchProductByUserIdQuery } from "../../redux/api/productApiSlice";
-import { useRemoveProductMutation } from "../../redux/api/productApiSlice";
+import { useRemoveProductBySellerMutation } from "../../redux/api/sellerApiSlice";
+import { useUpdateProductDetailsMutation } from "../../redux/api/productApiSlice";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
@@ -14,7 +15,8 @@ const SettingPage = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const userId = userInfo?._id || null;
   const { data: products = [], refetch } = useFetchProductByUserIdQuery(userId);
-  const [removeProduct] = useRemoveProductMutation();
+  const [removeProduct] = useRemoveProductBySellerMutation();
+  const [updateProduct] = useUpdateProductDetailsMutation();
   const [sortField, setSortField] = useState("name"); // Default sort by name
   const [sortOrder, setSortOrder] = useState("asc"); // Default order is ascending
 
@@ -75,7 +77,7 @@ const SettingPage = () => {
       const { data } = await removeProduct(id);
       toast.success(`"${data.name}" is deleted`, { autoClose: 2000 });
       refetch();
-      navigate("/admin/allproductslist");
+      // navigate("/admin/allproductslist");
     } catch (error) {
       toast.error("Delete failed. Try again.", { autoClose: 2000 });
     }
@@ -187,9 +189,9 @@ const SettingPage = () => {
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <button className="close-btn-allproduct" onClick={handleCloseModal}>
+            {/* <button className="close-btn-allproduct" onClick={handleCloseModal}>
               X
-            </button>
+            </button> */}
             <CreateProduct
               productInfo={productToEdit}
               onClose={handleCloseModal}

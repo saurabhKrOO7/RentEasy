@@ -11,8 +11,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router";
 
 const Cart = () => {
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const userId = userInfo?._id || "";
   const navigate = useNavigate();
-  const { _id: userId = "" } = useSelector((state) => state.auth.userInfo);
+  if (!userId) navigate("/login?redirect=/cart");
   const { data: cartItems = [], isLoading, refetch } = useGetCartItemsQuery();
   const [deleteFromCart] = useDeleteFromCartMutation();
   const [addProductToWishlist] = useAddProductToWishlistMutation();

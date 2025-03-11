@@ -25,7 +25,7 @@ const ReviewSection = ({ productId }) => {
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
   const [expanded, setExpanded] = useState({});
-
+  console.log(reviews);
   const settings = {
     dots: true,
     infinite: reviews.length > 1,
@@ -77,9 +77,9 @@ const ReviewSection = ({ productId }) => {
         <Grid item xs={12} md={6}>
           <Box sx={{ maxWidth: "100%", mx: "auto" }}>
             <Slider {...settings}>
-              {reviews.map((review, index) => (
+              {reviews.map((review, _id) => (
                 <Card
-                  key={index}
+                  key={_id}
                   sx={{
                     p: 4,
                     textAlign: "center",
@@ -89,17 +89,14 @@ const ReviewSection = ({ productId }) => {
                   }}
                 >
                   <Avatar
-                    src={
-                      review.sender.avatar ||
-                      `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        review.sender.name
-                      )}&background=random`
-                    }
-                    alt={review.sender.name}
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      review?.user?.name || "Anonymous"
+                    )}&background=random`}
+                    alt={review?.user?.name || "Anonymous"}
                     sx={{ width: 35, height: 35 }}
                   />
                   <Typography variant="h6" fontWeight="bold">
-                    {review?.user?.name}
+                    {review?.user?.name ? review.user.name : "Anonymous"}
                   </Typography>
                   <Rating value={review.rating} readOnly sx={{ mb: 1 }} />
                   <Typography
@@ -110,11 +107,11 @@ const ReviewSection = ({ productId }) => {
                     {new Date(review.createdAt).toLocaleDateString()}
                   </Typography>
                   <Typography sx={{ mt: 1 }}>
-                    {truncateText(review.comment, 100, expanded[index])}
+                    {truncateText(review.comment, 100, expanded[_id])}
                     {review.comment.length > 100 && (
                       <Typography
                         component="span"
-                        onClick={() => handleReadMoreToggle(index)}
+                        onClick={() => handleReadMoreToggle(_id)}
                         sx={{
                           color: "primary.main",
                           cursor: "pointer",
@@ -122,7 +119,7 @@ const ReviewSection = ({ productId }) => {
                           fontWeight: "bold",
                         }}
                       >
-                        {expanded[index] ? "Read less" : "Read more"}
+                        {expanded[_id] ? "Read less" : "Read more"}
                       </Typography>
                     )}
                   </Typography>

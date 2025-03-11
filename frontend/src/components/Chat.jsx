@@ -32,44 +32,38 @@ const Chat = () => {
   const { _id: productId } = useParams();
   const userInfo = useSelector((state) => state.auth.userInfo);
   const userId = userInfo?._id || null;
+
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [chatOpen, setChatOpen] = useState(false);
   const messagesEndRef = useRef(null);
-
   const [saveChatMessage] = useSaveChatMessageMutation();
-  const [updateSeenStatus] = useUpdateSeenStatusMutation();
+  const [markAsSeen] = useUpdateSeenStatusMutation();
   const { data, refetch } = useGetChatMessagesQuery(productId, {
     refetchOnMountOrArgChange: true,
   });
 
-  // Auto-scroll to the latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Load messages and mark them as seen
   useEffect(() => {
     if (data && Array.isArray(data)) {
       setMessages(data);
       socket.emit("messageSeen", { room: productId, userId });
-
-      // Update seen status in DB
       try {
-        updateSeenStatus({ productId, userId });
+        markAsSeen({ productId, userId });
       } catch (error) {
         console.error("Error updating seen status", error);
       }
     }
-  }, [data, productId, userId, updateSeenStatus]);
+  }, [data, productId, userId, markAsSeen]);
 
   useEffect(() => {
     socket.emit("joinRoom", productId);
-
     socket.on("messageUpdated", () => {
       refetch();
     });
-
     return () => {
       socket.off("messageUpdated");
     };
@@ -83,34 +77,26 @@ const Chat = () => {
       message,
       sender: {
         _id: userId,
-        name: userInfo.name,
+        name: "buyer",
       },
       timestamp: new Date().toISOString(),
-      seenBy: [userId], // Ensure sender sees their own message
+      seenBy: [userId],
     };
 
     try {
-      // Emit message to socket
       socket.emit("sendMessage", msgData);
-
-      // Optimistically update the local state
       setMessages((prevMessages) => [...prevMessages, msgData]);
-
-      // Save message to database
       await saveChatMessage(msgData);
-
-      // Trigger refetch to get updated messages from the database
       refetch();
-
       setMessage("");
     } catch (error) {
       console.error("Failed to send message", error);
     }
   };
+  if (!userId) return <></>;
 
   return (
     <>
-      {/* Floating Chat Icon */}
       <IconButton
         onClick={() => setChatOpen(true)}
         sx={{
@@ -127,8 +113,6 @@ const Chat = () => {
       >
         <ChatIcon fontSize="large" />
       </IconButton>
-
-      {/* Chat Window */}
       <Fade in={chatOpen}>
         <Box
           sx={{
@@ -151,7 +135,6 @@ const Chat = () => {
             },
           }}
         >
-          {/* Header */}
           <Box
             sx={{
               display: "flex",
@@ -170,24 +153,27 @@ const Chat = () => {
               <CloseIcon />
             </IconButton>
           </Box>
-
-          {/* Messages List */}
           <List sx={{ flexGrow: 1, overflowY: "auto", p: 1 }}>
             {messages.map((msg, index) => (
               <ListItem
                 key={index}
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                sx={{
+                  display: "flex",
+                  justifyContent:
+                    msg.sender._id === userId ? "flex-end" : "flex-start",
+                  alignItems: "center",
+                  gap: 1,
+                }}
               >
-                <Avatar
-                  src={
-                    msg.sender.avatar ||
-                    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                {msg.sender._id !== userId && (
+                  <Avatar
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
                       msg.sender.name
-                    )}&background=random`
-                  }
-                  alt={msg.sender.name}
-                  sx={{ width: 35, height: 35 }}
-                />
+                    )}&background=random`}
+                    alt={msg.sender.name}
+                    sx={{ width: 35, height: 35 }}
+                  />
+                )}
                 <Box
                   sx={{
                     bgcolor: msg.sender._id === userId ? "#4caf50" : "#2196f3",
@@ -197,9 +183,6 @@ const Chat = () => {
                     maxWidth: "75%",
                   }}
                 >
-                  <Typography sx={{ fontSize: "0.9rem", fontWeight: "bold" }}>
-                    {msg.sender._id === userId ? "You" : msg.sender.name}
-                  </Typography>
                   <Typography sx={{ fontSize: "0.95rem" }}>
                     {msg.message}
                   </Typography>
@@ -215,12 +198,19 @@ const Chat = () => {
                     {dayjs(msg.timestamp).format("h:mm A")}
                   </Typography>
                 </Box>
+                {msg.sender._id === userId && (
+                  <Avatar
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      msg.sender.name
+                    )}&background=random`}
+                    alt={msg.sender.name}
+                    sx={{ width: 35, height: 35 }}
+                  />
+                )}
               </ListItem>
             ))}
             <div ref={messagesEndRef} />
           </List>
-
-          {/* Input Field */}
           <Box sx={{ display: "flex", gap: 1, p: 2 }}>
             <TextField
               fullWidth
@@ -237,5 +227,4 @@ const Chat = () => {
     </>
   );
 };
-
 export default Chat;

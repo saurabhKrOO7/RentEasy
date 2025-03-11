@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import {
   Grid,
   Card,
@@ -31,21 +31,30 @@ import { useFetchProductAccordingToPageQuery } from "../../redux/api/productApiS
 import { useAddToCartMutation } from "../../redux/api/cartApiSlice.js";
 
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 // Default locations (backend should provide real ones)
 const locations = ["All", "New York", "Los Angeles", "Chicago", "Miami"];
 
 const AllProducts = () => {
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const userId = userInfo?._id || "";
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterCategory, setFilterCategory] = useState("all");
+
+  const locationHook = useLocation();
+  const queryParams = new URLSearchParams(locationHook.search);
+
+  const [searchTerm, setSearchTerm] = useState(queryParams.get("search") || "");
+  const [filterCategory, setFilterCategory] = useState(
+    queryParams.get("category") || "all"
+  );
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [sortOrder, setSortOrder] = useState("none");
   const [sortField, setSortField] = useState("name");
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage, setProductsPerPage] = useState(8);
   const [rentalRate, setRentalRate] = useState("daily");
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState(queryParams.get("location") || "");
 
   const { data: categories = [] } = useFetchCategoriesQuery();
   const {
@@ -93,8 +102,9 @@ const AllProducts = () => {
 
   const handleAddToCart = async (productId, quantity, rentalRate) => {
     try {
-      await addToCart({ productId, quantity, rentalRate });
-      toast.success("Product added to cart successfully");
+      const res = await addToCart({ productId, quantity, rentalRate });
+      if (!res.error) toast.success("Product added to cart successfully");
+      else toast.error(res.error.message || "Failed to add product to cart");
     } catch (error) {
       toast.error("Failed to add product to cart");
       console.error("Failed to add product to cart", error);
@@ -190,7 +200,7 @@ const AllProducts = () => {
                   <Box
                     sx={{ position: "absolute", top: 10, right: 10, zIndex: 2 }}
                   >
-                    <HeartIcon product={product} />
+                    {userId && <HeartIcon product={product} />}
                   </Box>
                   {/* 1st method */}
                   {/* <CardMedia

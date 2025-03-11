@@ -21,8 +21,11 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Grid } from "@mui/material";
 
 import Chat from "../../components/Chat.jsx";
+import { useSelector } from "react-redux";
 
 const ProductDetails = () => {
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const userId = userInfo?._id || "";
   const { _id: productId } = useParams();
   const {
     data: product = null,
@@ -56,8 +59,10 @@ const ProductDetails = () => {
 
   const handleAddToCart = async () => {
     try {
-      await addToCart({ productId, quantity, rentalRate });
-      toast.success("Product added to cart successfully");
+      const res = await addToCart({ productId, quantity, rentalRate });
+      console.log(res);
+      if (!res.error) toast.success("Product added to cart successfully");
+      else toast.error("You must login first!!");
     } catch (error) {
       toast.error("Failed to add product to cart");
       console.error("Failed to add product to cart", error);
@@ -156,7 +161,7 @@ const ProductDetails = () => {
               >
                 {product.name}
               </Typography>
-              <HeartIcon product={product} />
+              {userId && <HeartIcon product={product} />}
             </Box>
 
             <Typography
@@ -371,6 +376,7 @@ const ProductDetails = () => {
           </Paper>
         </Grid>
       </Grid>
+      
       <Chat />
       {/* Reviews Section */}
       <ReviewSection productId={product._id} />

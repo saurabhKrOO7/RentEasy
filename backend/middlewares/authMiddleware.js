@@ -37,4 +37,17 @@ const authorizeSeller = asyncHandler(async (req, res, next) => {
   }
 });
 
-export { authenticate, authorizeAdmin, authorizeSeller };
+const authorizeSellerAndAdmin = asyncHandler(async (req, res, next) => {
+  if (req.user && (req.user.role === "seller" || req.user.role === "admin")) {
+    next();
+  } else {
+    res.status(401).send("Not authorized as a Seller or Admin");
+  }
+});
+
+export {
+  authenticate,
+  authorizeAdmin,
+  authorizeSeller,
+  authorizeSellerAndAdmin,
+};

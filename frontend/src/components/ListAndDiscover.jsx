@@ -1,9 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import "./ListAndDiscover.css";
 import { IoDiamondOutline, IoSearchOutline } from "react-icons/io5";
 import { TfiLocationPin } from "react-icons/tfi";
+import { useNavigate } from "react-router";
 
 const ListAndDiscover = () => {
+  const navigate = useNavigate();
+  const [searchItem, setSearchItem] = useState("");
+  const [searchLocation, setSearchLocation] = useState("");
+
+  const handleSearchItem = async () => {
+    if (!searchItem && !searchLocation) return;
+    navigate(`/allproducts?search=${searchItem}&location=${searchLocation}`);
+  };
+
   return (
     <div className="list-discover-container">
       {/* Left Section */}
@@ -32,6 +42,8 @@ const ListAndDiscover = () => {
                 type="text"
                 className="abc-unique-search-input"
                 placeholder="Item"
+                value={searchItem}
+                onChange={(e) => setSearchItem(e.target.value)}
               />
             </div>
             <div className="abc-unique-search-divider"></div>
@@ -40,10 +52,15 @@ const ListAndDiscover = () => {
                 type="text"
                 className="abc-unique-location-input"
                 placeholder="Location"
+                value={searchLocation}
+                onChange={(e) => setSearchLocation(e.target.value)}
               />
             </div>
             <div className="abc-unique-search-button">
-              <button className="abc-unique-search-button">
+              <button
+                className="abc-unique-search-button"
+                onClick={handleSearchItem}
+              >
                 <IoSearchOutline />
               </button>
             </div>

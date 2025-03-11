@@ -90,6 +90,7 @@ const fetchProductAccordingToPage = asyncHandler(async (req, res) => {
         ? { category: req.query.category }
         : {};
 
+    // console.log(category);
     // Location filter (ignore "All", otherwise apply filter)
     const location = req.query.location
       ? { location: { $regex: req.query.location, $options: "i" } }
@@ -126,6 +127,8 @@ const fetchProductAccordingToPage = asyncHandler(async (req, res) => {
       ...location,
     });
 
+    // console.log(count);
+
     // Fetch products and apply case-insensitive sorting for string fields
     const products = await Product.find({
       ...keyword,
@@ -152,6 +155,8 @@ const fetchProductAccordingToPage = asyncHandler(async (req, res) => {
           : fieldB.localeCompare(fieldA);
       });
     }
+
+    // console.log(products);
 
     res.json({
       products,

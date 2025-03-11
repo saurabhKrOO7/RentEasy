@@ -4,8 +4,21 @@ import { IoDiamondOutline, IoSearchOutline } from "react-icons/io5";
 import { TfiLocationPin } from "react-icons/tfi";
 import FeaturedItems from "../components/FeaturedItems";
 import ListAndDiscover from "../components/ListAndDiscover";
+import { useNavigate } from "react-router";
 
 const Home = () => {
+  const navigate = useNavigate();
+  const [searchItem, setSearchItem] = useState("");
+  const [searchLocation, setSearchLocation] = useState("");
+
+  const handleSearchItem = async () => {
+    if (!searchItem && !searchLocation) return;
+    navigate(`/allproducts?search=${searchItem}&location=${searchLocation}`);
+  };
+  const handleCategory = (category) => {
+    if (!category) return;
+    navigate(`/allproducts?category=${category}`);
+  };
   return (
     <div className="unique-homepage">
       {/* Hero Section */}
@@ -30,6 +43,8 @@ const Home = () => {
               type="text"
               className="unique-search-input"
               placeholder="Search Item"
+              value={searchItem}
+              onChange={(e) => setSearchItem(e.target.value)}
             />
           </div>
           <div className="unique-search-divider"></div>
@@ -39,10 +54,12 @@ const Home = () => {
               type="text"
               className="unique-location-input"
               placeholder="Enter Location"
+              value={searchLocation}
+              onChange={(e) => setSearchLocation(e.target.value)}
             />
           </div>
           <div className="unique-search-button">
-            <button className="unique-search-button">
+            <button className="unique-search-button" onClick={handleSearchItem}>
               <IoSearchOutline />
             </button>
           </div>
@@ -75,7 +92,10 @@ const Home = () => {
       {/* feature container */}
       <h1>Feature Categories</h1>
       <div className="feature-grid-container">
-        <div className="feature-grid-item film">
+        <div
+          className="feature-grid-item film"
+          onClick={() => handleCategory("Travel")}
+        >
           <h2 className="feature-title">Film & Photography</h2>
           <div className="feature-overlay">
             <p>
@@ -83,25 +103,37 @@ const Home = () => {
             </p>
           </div>
         </div>
-        <div className="feature-grid-item electronics">
+        <div
+          className="feature-grid-item electronics"
+          onClick={() => handleCategory("Electronics")}
+        >
           <h2 className="feature-title">Electronics</h2>
           <div className="feature-overlay">
             <p>Laptop, Regrigerator, Sewing Machines and much more</p>
           </div>
         </div>
-        <div className="feature-grid-item houses">
+        <div
+          className="feature-grid-item houses"
+          onClick={() => handleCategory("Furnitures")}
+        >
           <h2 className="feature-title">Furnitures</h2>
           <div className="feature-overlay">
             <p>Get the best quality furniture at affordable prices</p>
           </div>
         </div>
-        <div className="feature-grid-item vehicles">
+        <div
+          className="feature-grid-item vehicles"
+          onClick={() => handleCategory("Vehicles")}
+        >
           <h2 className="feature-title">Vehicles</h2>
           <div className="feature-overlay">
             <p>Car, Bike, Scooter, and much more</p>
           </div>
         </div>
-        <div className="feature-grid-item clothes">
+        <div
+          className="feature-grid-item clothes"
+          onClick={() => handleCategory("Event Equipment")}
+        >
           <h2 className="feature-title">Events</h2>
           <div className="feature-overlay">
             <p>Get the best deals on events and tickets</p>

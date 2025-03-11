@@ -36,7 +36,7 @@ const saveChatMessage = asyncHandler(async (req, res) => {
     const buyerId = sender._id; // Buyer ID from sender
 
     let chat = await Chat.findOne({ productId, buyerId });
-
+    console.log(chat);
     if (!chat) {
       // If no chat exists, create a new one
       chat = await Chat.create({
@@ -81,6 +81,36 @@ const markAsSeen = asyncHandler(async (req, res) => {
   }
 });
 
+const markAsSeenForSeller = asyncHandler(async (req, res) => {
+  try {
+    const productId = req.params;
+    const sellerId = req.user._id; // Ensure this comes from auth middleware
+    console.log(sellerId, productId);
+    // Find chat where the seller is involved
+    const chat = await Chat.findOne({ productId, sellerId });
+
+    if (!chat) {
+      return res.json({ message: "No chat found" });
+    }
+
+    // Mark messages sent by the buyer as seen
+    chat.messages.forEach((msg) => {
+      if (
+        msg.sender._id.toString() !== sellerId.toString() &&
+        !msg.seenBy.includes(sellerId)
+      ) {
+        msg.seenBy.push(sellerId);
+      }
+    });
+
+    await chat.save();
+    console.log(chat);
+    res.json({ message: "Seller marked messages as seen" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update seen status" });
+  }
+});
+
 const getSellerChats = asyncHandler(async (req, res) => {
   const sellerId = req.user._id; // Extract seller ID from authenticated user
 
@@ -105,7 +135,6 @@ const getSellerChats = asyncHandler(async (req, res) => {
       })
       .populate("buyerId", "name email");
 
-    console.log("Chat:", chat);
     if (!chat) {
       return res.status(200).json([]); // Return an empty array if no chat exists
     }
@@ -146,11 +175,33 @@ const getUnseenMessages = asyncHandler(async (req, res) => {
     if (!chats.length) {
       return res.status(404).json({ message: "No unseen messages found" });
     }
-    console.log("Unseen messages:");
+
     res.status(200).json(chats);
   } catch (error) {
     console.error("Error fetching unseen messages:", error);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+const saveChatMessageFromSeller = asyncHandler(async (req, res) => {
+  try {
+    const { buyerId, productId, sender, message } = req.body;
+    const sellerId = sender._id;
+
+    let chat = await Chat.findOne({ productId, buyerId });
+    if (!chat) {
+      chat = await Chat.create({
+        productId,
+        buyerId,
+        messages: [{ sender, message, seenBy: [sellerId] }],
+      });
+    } else {
+      chat.messages.push({ sender, message, seenBy: [sellerId] });
+      await chat.save();
+    }
+    res.status(201).json(chat);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -160,4 +211,6 @@ export {
   getSellerChats,
   saveChatMessage,
   getUnseenMessages,
+  saveChatMessageFromSeller,
+  markAsSeenForSeller,
 };

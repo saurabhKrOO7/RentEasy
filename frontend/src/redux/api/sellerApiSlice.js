@@ -1,5 +1,5 @@
 import { apiSlice } from "./apiSlice.js";
-import { SELLERS_URL } from "../constants";
+import { PRODUCT_URL, SELLERS_URL } from "../constants";
 
 export const sellerApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -44,6 +44,13 @@ export const sellerApiSlice = apiSlice.injectEndpoints({
         method: "PUT",
       }),
     }),
+
+    removeProductBySeller: builder.mutation({
+      query: (id) => ({
+        url: `${SELLERS_URL}/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
@@ -54,4 +61,5 @@ export const {
   useShowAllOrdersOfSellerQuery,
   useApproveOrderMutation,
   useRejectOrderMutation,
+  useRemoveProductBySellerMutation,
 } = sellerApiSlice;

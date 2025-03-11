@@ -37,6 +37,7 @@ import Contact from "./components/Contact.jsx";
 import AllProducts from "./pages/Products/AllProducts.jsx";
 import SellerChat from "./pages/Renter/SellerChat.jsx";
 import SellerMessages from "./pages/Renter/SellerMessages.jsx";
+import BecomeSeller from "./components/BecomeSeller.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -49,6 +50,7 @@ const router = createBrowserRouter(
       <Route path="/cart" element={<Cart />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/allproducts" element={<AllProducts />} />
+      <Route path='/become-seller' element={<BecomeSeller />} />
 
       <Route path="" element={<PrivateRoute />}>
         <Route path="/order" element={<Order />} />

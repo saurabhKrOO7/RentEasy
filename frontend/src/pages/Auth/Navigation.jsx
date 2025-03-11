@@ -104,8 +104,20 @@ const Navigation = () => {
                   Post Ad
                 </Link>
               </li>
-            ) : null}
-
+            ) : (
+              <li>
+                <Link to="/become-seller" className="nav__link">
+                  <IoCloudUploadSharp />
+                  Become seller
+                </Link>
+              </li>
+            )}
+            <li>
+              <Link to="/allproducts" className="nav__link">
+                <BiCategory />
+                Products
+              </Link>
+            </li>
             <li>
               <div className="nav__link">
                 {!userInfo ? (

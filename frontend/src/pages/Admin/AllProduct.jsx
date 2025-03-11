@@ -21,6 +21,7 @@ const AllProduct = () => {
   const [sortField, setSortField] = useState("name");
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage, setProductsPerPage] = useState(10);
+  const [location, setLocation] = useState("");
 
   const handlePreview = (productId) => {
     navigate(`/productdetails/${productId}`);
@@ -38,9 +39,12 @@ const AllProduct = () => {
     pageSize: productsPerPage,
     keyword: searchTerm,
     category: filterCategory,
+    location,
     sortOrder: sortOrder,
     sortField: sortField,
   });
+
+  console.log(products);
 
   const { data: categories = [] } = useFetchCategoriesQuery();
 
@@ -276,9 +280,9 @@ const AllProduct = () => {
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <button className="close-btn-allproduct" onClick={handleCloseModal}>
+            {/* <button className="close-btn-allproduct" onClick={handleCloseModal}>
               X
-            </button>
+            </button> */}
             <CreateProduct
               productInfo={productToEdit}
               onClose={handleCloseModal}

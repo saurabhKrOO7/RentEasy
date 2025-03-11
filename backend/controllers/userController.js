@@ -164,6 +164,23 @@ const deleteUserById = asyncHandler(async (req, res) => {
   }
 });
 
+const becomeSeller = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (user) {
+    user.role = "seller";
+    const updatedUser = await user.save();
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      isSeller: updatedUser.isSeller,
+    });
+  } else {
+    res.status(404);
+    throw new Error("no user found");
+  }
+});
+
 export {
   createUser,
   loginUser,
@@ -173,4 +190,5 @@ export {
   updateUserProfile,
   updateUserById,
   deleteUserById,
+  becomeSeller,
 };

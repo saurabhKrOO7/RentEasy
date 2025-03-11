@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import "./CreateProduct.css";
+import { useNavigate } from "react-router-dom";
 import { useFetchCategoriesQuery } from "../../redux/api/categoryApiSlice";
 import {
   useCreateProductMutation,
@@ -8,6 +7,18 @@ import {
   useUpdateProductDetailsMutation,
 } from "../../redux/api/productApiSlice";
 import { toast } from "react-toastify";
+import {
+  Box,
+  Button,
+  Grid,
+  Paper,
+  TextField,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
 
 const CreateProduct = ({ productInfo, onClose }) => {
   const BASE_URL = "http://localhost:5000";
@@ -110,25 +121,18 @@ const CreateProduct = ({ productInfo, onClose }) => {
             productId: productInfo._id,
             formData: productData,
           }).unwrap();
-          console.log(data);
 
           if (data?.error) {
-            toast.error(data.error, {
-              autoClose: 2000,
-            });
+            toast.error(data.error, { autoClose: 2000 });
           } else {
             onClose();
-            toast.success(`Product successfully updated`, {
-              autoClose: 2000,
-            });
-            navigate("/admin/allproductslist");
+            toast.success(`Product successfully updated`, { autoClose: 2000 });
           }
         } else {
           const data = await createProduct(productData).unwrap();
           console.log(data);
-
           if (data.error) {
-            toast.error("Product creation failed. Try again! ");
+            toast.error("Product creation failed. Try again!");
           } else {
             toast.success(`${data.name} is created`);
             navigate("/");
@@ -143,177 +147,268 @@ const CreateProduct = ({ productInfo, onClose }) => {
       toast.error("Product creation failed. Try again!");
     }
   };
+
   return (
-    <div className="create-product">
-      <h2>{productInfo ? "Edit Product" : "Create Product"}</h2>
-      <form onSubmit={handleSubmit} className="category-forms">
-        <div className="category-form-group full-width">
-          <label htmlFor="photo">Upload Photo</label>
-          <input
-            type="file"
-            id="photo"
-            accept="image/*"
-            onChange={uploadFileHandler}
-          />
-          {photo && (
-            <img src={photo} alt="Uploaded Preview" className="preview" />
-          )}
-        </div>
+    <Paper
+      sx={{
+        maxWidth: 700,
+        width: "90%",
+        mx: "auto",
+        my: 10, // vertical margin to ensure top & bottom spacing
+        p: 3,
+        backgroundColor: "#f9f9f9",
+        borderRadius: 2,
+        boxShadow: 3,
+        maxHeight: "90vh", // limit the height
+        overflowY: "auto", // scrollable if content exceeds max height
+      }}
+    >
+      {/* You may place the close "X" button in the top-right corner */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+        <Button onClick={onClose} sx={{ minWidth: "auto", p: 0, fontSize: 18 }}>
+          &times;
+        </Button>
+      </Box>
+      <Typography variant="h4" textAlign="center" sx={{ mb: 3, color: "#333" }}>
+        {productInfo ? "Edit Product" : "Create Product"}
+      </Typography>
+      <Box
+        component="form"
+        noValidate
+        onSubmit={handleSubmit}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Button
+              variant="outlined"
+              component="label"
+              sx={{
+                textTransform: "none",
+                borderColor: "#ccc",
+                color: "#555",
+                "&:hover": { borderColor: "#007bff" },
+              }}
+            >
+              Upload Photo
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={uploadFileHandler}
+              />
+            </Button>
+            {photo && (
+              <Box
+                component="img"
+                src={photo}
+                alt="Uploaded Preview"
+                sx={{
+                  mt: 2,
+                  width: "100%",
+                  maxHeight: 200,
+                  objectFit: "contain",
+                  border: "1px solid #ddd",
+                  borderRadius: 1,
+                }}
+              />
+            )}
+          </Grid>
 
-        <div className="category-form-group full-width">
-          <label htmlFor="name">Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="category-form-group full-width">
-          <label>Rental Rate</label>
-          <div className="rental-rate-fields">
-            <input
-              type="number"
-              placeholder="Daily Rate"
-              value={rentalRate.daily}
-              onChange={(e) =>
-                setRentalRate({ ...rentalRate, daily: e.target.value })
-              }
+          <Grid item xs={12}>
+            <TextField
+              label="Name"
+              fullWidth
               required
+              variant="outlined"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
-            <input
-              type="number"
-              placeholder="Weekly Rate (Optional)"
-              value={rentalRate.weekly}
-              onChange={(e) =>
-                setRentalRate({ ...rentalRate, weekly: e.target.value })
-              }
-            />
-            <input
-              type="number"
-              placeholder="Monthly Rate (Optional)"
-              value={rentalRate.monthly}
-              onChange={(e) =>
-                setRentalRate({ ...rentalRate, monthly: e.target.value })
-              }
-            />
-          </div>
-        </div>
+          </Grid>
 
-        <div className="category-form-group">
-          <label htmlFor="description">Description</label>
-          <textarea
-            id="description"
-            name="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
-        </div>
+          <Grid item xs={12}>
+            <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+              Rental Rate
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={4}>
+                <TextField
+                  label="Daily Rate"
+                  type="number"
+                  required
+                  fullWidth
+                  variant="outlined"
+                  value={rentalRate.daily}
+                  onChange={(e) =>
+                    setRentalRate({ ...rentalRate, daily: e.target.value })
+                  }
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  label="Weekly Rate (Optional)"
+                  type="number"
+                  fullWidth
+                  variant="outlined"
+                  value={rentalRate.weekly}
+                  onChange={(e) =>
+                    setRentalRate({ ...rentalRate, weekly: e.target.value })
+                  }
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  label="Monthly Rate (Optional)"
+                  type="number"
+                  fullWidth
+                  variant="outlined"
+                  value={rentalRate.monthly}
+                  onChange={(e) =>
+                    setRentalRate({ ...rentalRate, monthly: e.target.value })
+                  }
+                />
+              </Grid>
+            </Grid>
+          </Grid>
 
-        <div className="category-form-group">
-          <label htmlFor="availability">Availability</label>
-          <select
-            id="availability"
-            name="availability"
-            value={availability}
-            onChange={(e) => setAvailability(e.target.value)}
-            required
-          >
-            <option value="" disabled>
-              Select availability
-            </option>
-            <option value="Available">Available</option>
-            <option value="Unavailable">Unavailable</option>
-          </select>
-          <div>
-            <label htmlFor="quantity">Quantity</label>
-            <input
-              type="number"
-              id="quantity"
-              name="quantity"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
+          <Grid item xs={12}>
+            <TextField
+              label="Description"
+              multiline
+              rows={4}
               required
+              fullWidth
+              variant="outlined"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
-          </div>
-        </div>
+          </Grid>
 
-        <div className="category-form-group">
-          <label htmlFor="location">Location</label>
-          <input
-            type="text"
-            id="location"
-            name="location"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            required
-          />
-        </div>
+          <Grid item xs={12}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <FormControl fullWidth required variant="outlined">
+                  <InputLabel id="availability-label">Availability</InputLabel>
+                  <Select
+                    labelId="availability-label"
+                    label="Availability"
+                    value={availability}
+                    onChange={(e) => setAvailability(e.target.value)}
+                  >
+                    <MenuItem value="">
+                      <em>Select availability</em>
+                    </MenuItem>
+                    <MenuItem value="Available">Available</MenuItem>
+                    <MenuItem value="Unavailable">Unavailable</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  label="Quantity"
+                  type="number"
+                  required
+                  fullWidth
+                  variant="outlined"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
 
-        <div className="category-form-group">
-          <label htmlFor="condition">Condition</label>
-          <select
-            id="condition"
-            name="condition"
-            value={condition}
-            onChange={(e) => setCondition(e.target.value)}
-            required
-          >
-            <option value="" disabled>
-              Select Condition status
-            </option>
-            <option value="New">New</option>
-            <option value="Used">Used</option>
-          </select>
-        </div>
+          <Grid item xs={12}>
+            <TextField
+              label="Location"
+              fullWidth
+              required
+              variant="outlined"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
+          </Grid>
 
-        <div className="category-form-group">
-          <label htmlFor="insurance">Insurance Status</label>
-          <select
-            id="insuranceStatus"
-            name="insuranceStatus"
-            value={insuranceStatus}
-            onChange={(e) => setInsurance(e.target.value)}
-            required
-          >
-            <option value="" disabled>
-              Select insurance status
-            </option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
-        </div>
+          <Grid item xs={12}>
+            <FormControl fullWidth required variant="outlined">
+              <InputLabel id="condition-label">Condition</InputLabel>
+              <Select
+                labelId="condition-label"
+                label="Condition"
+                value={condition}
+                onChange={(e) => setCondition(e.target.value)}
+              >
+                <MenuItem value="">
+                  <em>Select Condition</em>
+                </MenuItem>
+                <MenuItem value="New">New</MenuItem>
+                <MenuItem value="Used">Used</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
 
-        <div className="category-form-group">
-          <label htmlFor="category">Category</label>
-          <select
-            id="category"
-            name="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-          >
-            <option value="" disabled>
-              Select a category
-            </option>
-            {categories &&
-              categories?.map((cat) => (
-                <option key={cat._id} value={cat.name}>
-                  {cat.name}
-                </option>
-              ))}
-          </select>
-        </div>
+          <Grid item xs={12}>
+            <FormControl fullWidth required variant="outlined">
+              <InputLabel id="insurance-label">Insurance Status</InputLabel>
+              <Select
+                labelId="insurance-label"
+                label="Insurance Status"
+                value={insuranceStatus}
+                onChange={(e) => setInsurance(e.target.value)}
+              >
+                <MenuItem value="">
+                  <em>Select Insurance Status</em>
+                </MenuItem>
+                <MenuItem value="Yes">Yes</MenuItem>
+                <MenuItem value="No">No</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
 
-        <button type="submit" className="submit-btn full-width">
-          {productInfo ? "Edit Product" : "Create Product"}
-        </button>
-      </form>
-    </div>
+          <Grid item xs={12}>
+            <FormControl fullWidth required variant="outlined">
+              <InputLabel id="category-label">Category</InputLabel>
+              <Select
+                labelId="category-label"
+                label="Category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <MenuItem value="">
+                  <em>Select a category</em>
+                </MenuItem>
+                {categories.map((cat) => (
+                  <MenuItem key={cat._id} value={cat.name}>
+                    {cat.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{
+                py: 1.5,
+                backgroundColor: "#007bff",
+                color: "#fff",
+                textTransform: "none",
+                "&:hover": { backgroundColor: "#0056b3" },
+              }}
+            >
+              {productInfo ? "Edit Product" : "Create Product"}
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+    </Paper>
   );
 };
+
 export default CreateProduct;

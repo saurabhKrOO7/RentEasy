@@ -7,7 +7,8 @@ import {
   getUserProfile,
   updateUserProfile,
   updateUserById,
-  deleteUserById
+  deleteUserById,
+  becomeSeller
 } from "../controllers/userController.js";
 import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
 
@@ -25,6 +26,8 @@ router
   .route("/profile")
   .get(authenticate, getUserProfile)
   .put(authenticate, updateUserProfile);
+
+router.route("/become-seller").put(authenticate, becomeSeller);
 
 router
   .route("/:id")
