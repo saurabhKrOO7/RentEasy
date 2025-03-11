@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import {
   Box,
@@ -20,7 +20,8 @@ import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Grid } from "@mui/material";
 
-import Chat from "../../components/Chat.jsx";
+// import Chat from "../../components/Chat.jsx";
+const Chat = React.lazy(() => import("../../components/Chat.jsx"));
 import { useSelector } from "react-redux";
 
 const ProductDetails = () => {
@@ -376,7 +377,7 @@ const ProductDetails = () => {
           </Paper>
         </Grid>
       </Grid>
-      
+
       <Chat />
       {/* Reviews Section */}
       <ReviewSection productId={product._id} />
