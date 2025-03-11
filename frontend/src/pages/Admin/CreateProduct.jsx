@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 
 const CreateProduct = ({ productInfo, onClose }) => {
-  const BASE_URL = "http://localhost:5000";
+  const BASE_URL = "https://renteasy-backend.onrender.com";
   const [image, setImage] = useState([]);
   const [name, setName] = useState("");
   const [rentalRate, setRentalRate] = useState({

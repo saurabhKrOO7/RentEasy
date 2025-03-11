@@ -23,7 +23,7 @@ import {
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 
-const socket = io("http://localhost:5000", {
+const socket = io("https://renteasy-backend.onrender.com", {
   withCredentials: true,
   transports: ["websocket", "polling"],
 });

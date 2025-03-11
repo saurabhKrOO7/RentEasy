@@ -21,7 +21,7 @@ const SellerChat = () => {
 
   useEffect(() => {
     // Connect to the socket server
-    const newSocket = io("http://localhost:5000"); // Adjust for production
+    const newSocket = io("https://renteasy-backend.onrender.com"); // Adjust for production
     setSocket(newSocket);
 
     newSocket.emit("joinRoom", { buyerId });

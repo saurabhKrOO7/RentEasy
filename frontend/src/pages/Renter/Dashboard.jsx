@@ -67,7 +67,7 @@ const Dashboard = () => {
   const { data: unseenMessages = [] } = useGetUnseenMessagesQuery();
   console.log(unseenMessages);
   useEffect(() => {
-    const newSocket = io("http://localhost:5000");
+    const newSocket = io("https://renteasy-backend.onrender.com");
     setSocket(newSocket);
 
     newSocket.on("connect", () => {

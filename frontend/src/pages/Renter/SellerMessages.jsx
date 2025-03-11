@@ -69,7 +69,7 @@ const SellerMessages = () => {
 
   useEffect(() => {
     // Connect to Socket.io server
-    const newSocket = io("http://localhost:5000"); // Adjust in production
+    const newSocket = io("https://renteasy-backend.onrender.com"); // Adjust in production
     setSocket(newSocket);
 
     if (selectedChat) {

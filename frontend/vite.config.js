@@ -7,10 +7,10 @@ export default defineConfig({
   server: {
     proxy: {
       "/api/": {
-        target: "http://localhost:5000",
+        target: "https://renteasy-backend.onrender.com",
         changeOrigin: true,
       },
-      "/uploads/": "http://localhost:5000",
+      "/uploads/": "https://renteasy-backend.onrender.com",
     },
   },
 });
