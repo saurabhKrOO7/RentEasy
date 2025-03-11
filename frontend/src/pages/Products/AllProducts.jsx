@@ -249,7 +249,10 @@ const AllProducts = () => {
                       product.images.map((img, index) => (
                         <SwiperSlide key={index}>
                           <img
-                            src={`https://renteasy-frontend.onrender.com/${img}`}
+                            src={`https://renteasy-frontend.onrender.com/${img.replace(
+                              /^\/+/,
+                              ""
+                            )}`}
                             alt={`${product.name} - ${index + 1}`}
                             style={{
                               width: "100%",
