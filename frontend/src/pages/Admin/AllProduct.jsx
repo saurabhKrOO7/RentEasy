@@ -9,7 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import CreateProduct from "./CreateProduct";
 import { toast } from "react-toastify";
 import { PRODUCT_URL } from "../../redux/constants";
-import ProductDetails from "../Products/productDetails";
+import ProductDetails from "../Products/ProductDetails.jsx";
 
 const AllProduct = () => {
   const navigate = useNavigate();
