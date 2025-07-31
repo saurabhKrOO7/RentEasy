@@ -33,7 +33,7 @@ const ListAndDiscover = () => {
         className="list-discover-section list-discover-right"
         style={{
           backgroundImage:
-            "https://res.cloudinary.com/dnc91rlep/image/upload/v1753991936/listAndDiscover_wmq1jt.png",
+            "url('https://res.cloudinary.com/dnc91rlep/image/upload/v1753990142/images-1737289388515_q8v48b.png')",
         }}
       >
         <div className="list-discover-overlay">
