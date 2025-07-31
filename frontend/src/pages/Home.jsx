@@ -144,7 +144,7 @@ const Home = () => {
       <div className="about-container">
         <div className="about-images">
           <img
-            src="./images/about.png"
+            src="https://res.cloudinary.com/dnc91rlep/image/upload/v1753991950/about_rvpjrv.png"
             alt="Person with laptop"
             className="img1"
           />

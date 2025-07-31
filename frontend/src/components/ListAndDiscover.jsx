@@ -31,7 +31,10 @@ const ListAndDiscover = () => {
       {/* Right Section */}
       <div
         className="list-discover-section list-discover-right"
-        style={{ backgroundImage: "url('../../images/listAndDiscover2.png')" }}
+        style={{
+          backgroundImage:
+            "https://res.cloudinary.com/dnc91rlep/image/upload/v1753991936/listAndDiscover_wmq1jt.png",
+        }}
       >
         <div className="list-discover-overlay">
           <h2 className="list-discover-heading">Discover Item</h2>
