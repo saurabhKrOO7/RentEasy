@@ -5,7 +5,12 @@ import cloudinary from "../config/cloudinary.js";
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "RentEasy",
+    folder: "uploads",
+    public_id: (req, file) => {
+      const name = file.originalname.split(".")[0];
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      return `${name}-${uniqueSuffix}`;
+    },
     allowed_formats: ["jpeg", "png", "jpg", "webp"],
   },
 });

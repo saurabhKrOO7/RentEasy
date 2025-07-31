@@ -64,7 +64,7 @@ const Navigation = () => {
         <div className="nav__data">
           <Link to="/" className="nav__logo">
             <img
-              src="https://res.cloudinary.com/dnc91rlep/image/upload/v1753991900/logo_cxj9pi.png"
+              src="https://res.cloudinary.com/dnc91rlep/image/upload/v1753995318/logoo_gsyjc5.png"
               alt="Logo"
             />
           </Link>
