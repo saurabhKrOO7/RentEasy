@@ -63,7 +63,10 @@ const Navigation = () => {
       <nav className="nav container">
         <div className="nav__data">
           <Link to="/" className="nav__logo">
-            <img src="../../../images/logo.png" alt="Logo" />
+            <img
+              src="https://res.cloudinary.com/dnc91rlep/image/upload/v1753991900/logo_cxj9pi.png"
+              alt="Logo"
+            />
           </Link>
 
           <div className="nav__toggle" id="nav-toggle">

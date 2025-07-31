@@ -19,7 +19,10 @@ const ListAndDiscover = () => {
       {/* Left Section */}
       <div
         className="list-discover-section list-discover-left"
-        style={{ backgroundImage: "url('../../images/listAndDiscover.png')" }}
+        style={{
+          backgroundImage:
+            "url('https://res.cloudinary.com/dnc91rlep/image/upload/v1753991936/listAndDiscover_wmq1jt.png')",
+        }}
       >
         <div className="list-discover-overlay">
           <h2 className="list-discover-heading">List Your Assets</h2>
@@ -33,7 +36,7 @@ const ListAndDiscover = () => {
         className="list-discover-section list-discover-right"
         style={{
           backgroundImage:
-            "url('https://res.cloudinary.com/dnc91rlep/image/upload/v1753990142/images-1737289388515_q8v48b.png')",
+            "url('https://res.cloudinary.com/dnc91rlep/image/upload/v1753991921/listAndDiscover2_drcp9m.png')",
         }}
       >
         <div className="list-discover-overlay">

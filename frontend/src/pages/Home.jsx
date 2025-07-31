@@ -68,21 +68,24 @@ const Home = () => {
       <div className="show-container">
         <div className="show-card">
           <div className="show-icon">
-            <img src="../images/hero1.png" alt="hero1" />
+            <img
+              src="https://res.cloudinary.com/dnc91rlep/image/upload/v1753991911/hero1_cxxaws.png"
+              alt="hero1"
+            />
           </div>
           <h3>Access More</h3>
           <p>Pursue passions. Get things done</p>
         </div>
         <div className="show-card">
           <div className="show-icon">
-            <img src="../images/hero2.png" alt="hero2" />
+            <img src="https://res.cloudinary.com/dnc91rlep/image/upload/v1753991894/hero2_vybzxm.png" alt="hero2" />
           </div>
           <h3>Help The Planet</h3>
           <p>Live lighter. Reduce waste</p>
         </div>
         <div className="show-card">
           <div className="show-icon">
-            <img src="../images/hero3.png" alt="hero2" />
+            <img src="https://res.cloudinary.com/dnc91rlep/image/upload/v1753991898/hero3_iigvw2.png" alt="hero2" />
           </div>
           <h3>Save Money</h3>
           <p>Buy less. Rent for a fraction of cost</p>
