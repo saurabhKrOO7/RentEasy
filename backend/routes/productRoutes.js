@@ -1,5 +1,4 @@
 import express from "express";
-import formidable from "express-formidable";
 const router = express.Router();
 import {
   authenticate,
@@ -23,7 +22,7 @@ import {
 router
   .route("/")
   .get(fetchProductAccordingToPage)
-  .post(authenticate, formidable(), addProduct);
+  .post(authenticate, authorizeSellerAndAdmin, addProduct);
 
 router.route("/allproducts").get(fetchAllProducts);
 router.route("/:id/reviews").post(authenticate, checkId, addProductReview);
@@ -34,7 +33,6 @@ router
   .put(
     authenticate,
     authorizeSellerAndAdmin,
-    formidable(),
     updateProductDetails
   )
   .delete(authenticate, authorizeAdmin, checkId, removeProduct);

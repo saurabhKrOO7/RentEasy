@@ -74,9 +74,10 @@ app.use("/api/config/paypal", (req, res) => {
 app.post("/api/send-email", sendReceiptEmail);
 app.post("/api/contact", contactMessage);
 
-// For uploading the image in uploads folder
-const __dirname = path.resolve();
-app.use("/uploads", express.static(path.join(__dirname + "/uploads")));
+// The 'uploads' folder is no longer served locally as images are now on Cloudinary.
+// This can be removed.
+// const __dirname = path.resolve();
+// app.use("/uploads", express.static(path.join(__dirname + "/uploads")));
 
 // 🔹 Setup Socket.io for real-time chat
 

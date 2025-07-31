@@ -21,7 +21,6 @@ import {
 } from "@mui/material";
 
 const CreateProduct = ({ productInfo, onClose }) => {
-  const BASE_URL = "https://renteasy-backend.onrender.com";
   const [image, setImage] = useState([]);
   const [name, setName] = useState("");
   const [rentalRate, setRentalRate] = useState({
@@ -42,10 +41,8 @@ const CreateProduct = ({ productInfo, onClose }) => {
 
   useEffect(() => {
     if (productInfo) {
-      const imagePath = `${BASE_URL}${productInfo.images[0]}`;
-      const x = productInfo.images[0];
-      setImage(x || []);
-      setPhoto(imagePath || null);
+      setImage(productInfo.images || []);
+      setPhoto(productInfo.images[0] || null);
       setName(productInfo.name || "");
       setRentalRate({
         daily: productInfo.rentalRate?.daily || "",
@@ -74,7 +71,7 @@ const CreateProduct = ({ productInfo, onClose }) => {
     try {
       const res = await uploadProductImage(formData).unwrap();
       toast.success(res.message);
-      setImage(res.image);
+      setImage([res.image]); // Cloudinary returns a single URL, store it in an array
       setPhoto(res.image);
     } catch (error) {
       console.log(error);
@@ -86,7 +83,7 @@ const CreateProduct = ({ productInfo, onClose }) => {
     e.preventDefault();
 
     if (
-      !image ||
+      !image.length ||
       !name.trim() ||
       !rentalRate.daily ||
       !description.trim() ||
@@ -102,7 +99,7 @@ const CreateProduct = ({ productInfo, onClose }) => {
 
     try {
       const productData = new FormData();
-      productData.append("images", image);
+      productData.append("images", image[0]); // Send the first image URL
       productData.append("name", name);
       productData.append("daily", rentalRate.daily);
       productData.append("weekly", rentalRate.weekly || 0);

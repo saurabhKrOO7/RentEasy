@@ -1,46 +1,23 @@
-import path from "path";
 import express from "express";
-import multer from "multer";
+import upload from "../middlewares/uploadMiddleware.js";
 
 const router = express.Router();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    const extname = path.extname(file.originalname);
-    cb(null, `${file.fieldname}-${Date.now()}${extname}`);
-  },
-});
-
-const fileFilter = (req, file, cb) => {
-  const filetypes = /jpe?g|png|webp/;
-  const mimetypes = /image\/jpe?g|image\/png|image\/webp/;
-  const extname = path.extname(file.originalname).toLowerCase();
-  const mimetype = file.mimetype;
-
-  if (filetypes.test(extname) && mimetypes.test(mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error("Image only"), false);
-  }
-};
-
-const upload = multer({ storage, fileFilter });
-const uploadSingleImage = upload.single("images");
-
 router.post("/", (req, res) => {
+  const uploadSingleImage = upload.single("images");
   uploadSingleImage(req, res, (err) => {
     if (err) {
-      res.status(400).send({ message: err });
+      // The error from Cloudinary/Multer will be here
+      return res
+        .status(400)
+        .send({ message: err.message || "File upload failed." });
     } else if (req.file) {
       res.status(200).send({
         message: "Image uploaded successfully",
-        image: `/${req.file.path}`,
+        image: req.file.path, // The `path` property from cloudinary-storage is the URL
       });
     } else {
-      res.status(400).send({ messae: "No image file provided" });
+      res.status(400).send({ message: "No image file provided" });
     }
   });
 });
